@@ -1,6 +1,6 @@
 export interface IPlayerInfo{
     id:number,
-    playerName:string,
+    username:string,
     score:Number
     linesCleared:Number,
     elementsDroped:Number,

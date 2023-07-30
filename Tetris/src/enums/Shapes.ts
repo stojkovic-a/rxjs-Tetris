@@ -5,6 +5,6 @@ export enum Shapes{
     S,
     Z,
     L,
-    J
+    J,
 
 }

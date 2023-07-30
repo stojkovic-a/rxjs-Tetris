@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
     "watch": "webpack --watch",
-    "api":"json-server --watch database-db.json"
+    "api":"json-server --watch ./db/database-db.json"
   },
   "author": "",
   "license": "ISC",

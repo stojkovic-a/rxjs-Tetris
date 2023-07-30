@@ -1,7 +1,8 @@
-import { Shapes } from "../enums/Shapes";
+import { IShapeTypes } from "./IShapeTypes";
 
 export interface IShapes{
-    block:Shapes,
+    block:IShapeTypes,
+    sprite:string,
     posX:Number,
     posY:Number,
     rotation:Number,

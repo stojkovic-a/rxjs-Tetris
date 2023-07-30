@@ -1,0 +1,53 @@
+{
+    "users": [
+        {
+            "id":1,
+            "username": "aleksandar",
+            "highscore": 0,
+            "linesCleared": 0,
+            "elementsDroped": 0,
+            "timePlaying": 0
+        },
+        {
+            "id":2,
+            "username": "milan",
+            "highscore": 0,
+            "linesCleared": 0,
+            "elementsDroped": 0,
+            "timePlaying": 0
+        }
+    ],
+    "sprites": {
+        "path": "../src/assets",
+        "shapes":[
+            {
+                "type":"I",
+                "image":"I.png"
+            },
+            {
+                "type":"J",
+                "image":"J.png"
+            },
+            {
+                "type":"L",
+                "image":"L.png"
+            },
+            {
+                "type":"O",
+                "image":"O.png"
+            },
+            {
+                "type":"S",
+                "image":"S.png"
+            },
+            {
+                "type":"T",
+                "image":"T.png"
+            },
+            {
+                "type":"Z",
+                "image":"Z.png"
+            }
+        ]
+    }
+}
