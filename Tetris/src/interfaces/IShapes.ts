@@ -6,4 +6,5 @@ export interface IShapes{
     posX:Number,
     posY:Number,
     rotation:Number,
+    speed:Number
 }

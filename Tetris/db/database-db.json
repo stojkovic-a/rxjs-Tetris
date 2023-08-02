@@ -48,6 +48,7 @@
                 "type":"Z",
                 "image":"Z.png"
             }
-        ]
+        ],
+        "board":"Board.png"
     }
 }
