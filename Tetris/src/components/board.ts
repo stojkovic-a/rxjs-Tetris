@@ -49,10 +49,15 @@ export class Board extends Component {
                     canPos = false;
                     return canPos;
                 }
-                if(mat[i][j]===1&& (i+posY>=this._sizeY||j+posX>=this._sizeX)){
-                    canPos=false;
+                if (mat[i][j] === 1 && (i + posY >= this._sizeY || j + posX >= this._sizeX)) {
+                    canPos = false;
                     return canPos;
                 }
+                if (mat[i][j] === 1 && (i + posY < 0 || j + posX < 0)) {
+                    canPos = false;
+                    return canPos;
+                }
+
             }
         }
         return canPos;
@@ -106,9 +111,22 @@ export class Board extends Component {
                 for (let j = 0; j < this._board[i].length; j++) {
                     this._board[i][j] = false;
                 }
+                this.lowerFlyingRows(i);
             }
         }
         return numRemoved;
+    }
+
+    lowerFlyingRows(removedRow: number): void {
+        for (let i = removedRow; i > 0; i--) {
+            for (let j = 0; j < this._sizeX; j++) {
+                this._board[i][j] = this._board[i - 1][j];
+            }
+        }
+
+        for (let i = 0; i < this._sizeX; i++) {
+            this._board[0][i] = false;
+        }
     }
 
 
