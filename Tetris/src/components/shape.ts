@@ -18,7 +18,7 @@ export abstract class Shape extends Component {
     protected readonly board: Board;
     protected bgBound: IRectangle;
     protected readonly shapeBound: IRectangle;
-    public readonly moving: Boolean;
+    public moving: boolean;
     rotation: number;
     tickTime: number;
     protected colisionDetectionMatrix: number[][]
@@ -123,6 +123,8 @@ export class ShapeI extends Shape {
                     } else {
                         const { check, num } = this.board.tryAdd(this.posX, this.posY, this.colisionDetectionMatrix);
                         if (!check) throw new Error("Impossible position");
+                        this.moving = false;
+                        this.tickTime = Infinity;
                         return num;
                     }
                 } else
@@ -139,7 +141,15 @@ export class ShapeI extends Shape {
                                 this.onResize(this.bgBound.width, this.bgBound.height);
                                 this.render();
                             }
-                        }
+                        } else
+                            if (keysDown.keys[0] === 'Space') {
+                                let num = 0
+                                do {
+                                    num = this.update(0, { keys: ["ArrowDown"] });
+                                } while (num === 0);
+                                return num;
+                            }
+            return -1;
         }
     }
 
@@ -178,7 +188,7 @@ export class ShapeI extends Shape {
     }
 
     hasColided(): boolean {
-        return false;
+        return this.moving;
     }
 
 }
@@ -333,7 +343,7 @@ export class ShapeT extends Shape {
 
     }
     hasColided(): boolean {
-        return false;
+        return this.moving;
     }
 
 }
@@ -424,7 +434,7 @@ export class ShapeO extends Shape {
         return;
     }
     hasColided(): boolean {
-        return false;
+        return this.moving;
     }
 
 }
@@ -548,7 +558,7 @@ export class ShapeS extends Shape {
             }
     }
     hasColided(): boolean {
-        return false;
+        return this.moving;
     }
 
 }
@@ -673,7 +683,7 @@ export class ShapeZ extends Shape {
             }
     }
     hasColided(): boolean {
-        return false;
+        return this.moving;
     }
 
 }
@@ -827,7 +837,7 @@ export class ShapeL extends Shape {
                     }
     }
     hasColided(): boolean {
-        return false;
+        return this.moving;
     }
 
 }
@@ -981,7 +991,7 @@ export class ShapeJ extends Shape {
                     }
     }
     hasColided(): boolean {
-        return false;
+        return this.moving;
     }
 
 }

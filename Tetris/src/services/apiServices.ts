@@ -27,7 +27,7 @@ const fetchPlayerProfile$ = (
     return fetchFromApi$<IUsersScores>(`users?username=${username}`)
 }
 
-const fetchLeaderBoard$ = (): Observable<IUsersScores[]> => {
+const fetchHighScore$ = (): Observable<IUsersScores[]> => {
     return fetchFromApi$<IUsersScores[]>(`users?_sort=highscore&_order=desc&_limit=10`)
 }
 
@@ -72,4 +72,4 @@ const putPlayerProfile = (player: IUsersScores): Promise<IUsersScores> => {
     });
 }
 
-export { fetchFromApi$, fetchPlayerProfile$, fetchLeaderBoard$, fetchSprite$,putPlayerProfile }
+export { fetchFromApi$, fetchPlayerProfile$, fetchHighScore$, fetchSprite$,putPlayerProfile }

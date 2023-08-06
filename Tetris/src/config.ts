@@ -4,3 +4,13 @@ export const BOARD_BLOCKS_WIDTH=10;
 export const BOARD_BLOCKS_HEIGHt=20;
 export const BOARD_BORDER_SHIFT_X=1/12;
 export const BOARD_BORDER_SHIFT_Y=1/22;
+
+
+export const SMALL_TEXT_FONT = '1rem "Press Start 2P"';
+export const MEDIUM_TEXT_FONT = '2rem "Press Start 2P"';
+export const LARGE_TEXT_FONT = '3rem "Press Start 2P"';
+export const FONT_COLOR = 'white';
+export const FONT_SHADOW_COLOR = 'gray';
+export const FONT_SHADOW_SIZE = 3;
+
+export const STARTING_DELTA_TIME=0.8;

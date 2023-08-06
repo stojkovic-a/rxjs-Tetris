@@ -1,8 +1,8 @@
 export interface IUsersScores{
-    id:Number,
+    id:number,
     username: string,
-    highscore: Number,
-    linesCleared: Number,
-    elementsDroped: Number,
-    timePlaying: Number
+    highscore: number,
+    linesCleared: number,
+    elementsDroped: number,
+    timePlaying: number
 }

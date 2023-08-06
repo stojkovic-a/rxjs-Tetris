@@ -1,8 +1,9 @@
 export interface IPlayerInfo{
     id:number,
     username:string,
-    score:Number
-    linesCleared:Number,
-    elementsDroped:Number,
-    timePlaying:Number
+    score:number
+    linesCleared:number,
+    elementsDroped:number,
+    timePlaying:number,
+    highscore:number
 }

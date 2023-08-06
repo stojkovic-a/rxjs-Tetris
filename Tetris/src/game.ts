@@ -26,7 +26,7 @@ export class Game {
             })
 
         loadBackgroundImage$().subscribe((img) => {
-            this.background=new Background
+           // this.background=new Background
         })
     }
 

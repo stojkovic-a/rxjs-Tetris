@@ -1,3 +1,4 @@
+import { FONT_COLOR, FONT_SHADOW_COLOR, FONT_SHADOW_SIZE } from "../config";
 import { IRectangle } from "../interfaces/IRectangle";
 
 const fillRect = (ctx: CanvasRenderingContext2D, rect: IRectangle) => {
@@ -30,43 +31,43 @@ const drawImageRegion=(
     );
 }
 
-// const applyFont = (ctx: CanvasRenderingContext2D, font: string) => {
-//     ctx.font = font;
-//     ctx.fillStyle = FONT_COLOR;
-//     ctx.shadowColor = FONT_SHADOW_COLOR;
-//     ctx.shadowOffsetX = FONT_SHADOW_SIZE;
-//     ctx.shadowOffsetY = FONT_SHADOW_SIZE;
-//   };
+const applyFont = (ctx: CanvasRenderingContext2D, font: string) => {
+    ctx.font = font;
+    ctx.fillStyle = FONT_COLOR;
+    ctx.shadowColor = FONT_SHADOW_COLOR;
+    ctx.shadowOffsetX = FONT_SHADOW_SIZE;
+    ctx.shadowOffsetY = FONT_SHADOW_SIZE;
+  };
   
-//   const clearFont = (ctx: CanvasRenderingContext2D) => {
-//     ctx.shadowColor = undefined;
-//     ctx.shadowOffsetX = 0;
-//     ctx.shadowOffsetY = 0;
-//   };
+  const clearFont = (ctx: CanvasRenderingContext2D) => {
+    ctx.shadowColor = undefined;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+  };
 
-// const drawText = (
-//     ctx: CanvasRenderingContext2D,
-//     text: string,
-//     font: string,
-//     x: number,
-//     y: number,
-//   ) => {
-//     applyFont(ctx, font);
-//     ctx.fillText(text, x, y);
-//     clearFont(ctx);
-//   };
+const drawText = (
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    font: string,
+    x: number,
+    y: number,
+  ) => {
+    applyFont(ctx, font);
+    ctx.fillText(text, x, y);
+    clearFont(ctx);
+  };
   
-// const drawCenteredText = (
-//     ctx: CanvasRenderingContext2D,
-//     text: string,
-//     font: string,
-//     centerX: number,
-//     y: number,
-//   ) => {
-//     applyFont(ctx, font);
-//     ctx.fillText(text, centerX - ctx.measureText(text).width / 2, y);
-//     clearFont(ctx);
-//   };
+const drawCenteredText = (
+    ctx: CanvasRenderingContext2D,
+    text: string,
+    font: string,
+    centerX: number,
+    y: number,
+  ) => {
+    applyFont(ctx, font);
+    ctx.fillText(text, centerX - ctx.measureText(text).width / 2, y);
+    clearFont(ctx);
+  };
   
-  export { fillRect, drawImage, drawImageRegion};//, drawText, drawCenteredText };
+  export { fillRect, drawImage, drawImageRegion, drawText, drawCenteredText };
   
