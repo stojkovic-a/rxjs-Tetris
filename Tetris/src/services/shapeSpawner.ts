@@ -1,10 +1,8 @@
-import { Observable } from "rxjs";
+import { Observable, defer, map, of } from "rxjs";
 import { IGameState } from "../interfaces/IGameState";
 import { Shape } from "../components/shape";
 
-// const shapeSpawner$=(
-//     ctx:CanvasRenderingContext2D,
-//     gameState:IGameState,
-// ):Observable<Shape>=>{
-
-// }
+export const shapeSpawner=():Observable<number>=>{
+    return defer(()=>of(Math.floor(Math.random()*7)))
+    
+}

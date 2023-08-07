@@ -1,3 +1,5 @@
+import { GamePhase } from "./enums/GamePhase";
+
 export const API_URL='http://localhost:3000'
 export const BACKGROUND_ASPECT_RATIO = 3.125;
 export const BOARD_BLOCKS_WIDTH=10;
@@ -14,3 +16,23 @@ export const FONT_SHADOW_COLOR = 'gray';
 export const FONT_SHADOW_SIZE = 3;
 
 export const STARTING_DELTA_TIME=0.8;
+
+
+export const MIN_INTERVAL_MS=50;
+export const INITIAL_TIME_MS=800;
+export const NUM_SHAPES=7;
+
+
+export const INITIAL_GAME_STATE={
+    currentState:GamePhase.ENTER_NAME,
+    score:0,
+    player:{
+        id:0,
+        username:'',
+        score:0,
+        linesCleared:0,
+        elementsDroped:0,
+        timePlaying:0,
+        highscore:0
+    }
+}

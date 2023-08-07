@@ -18,7 +18,7 @@
         }
     ],
     "sprites": {
-        "path": "../src/assets",
+        "path": "./src/assets/",
         "shapes":[
             {
                 "type":"I",

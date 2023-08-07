@@ -33,12 +33,12 @@ const fetchHighScore$ = (): Observable<IUsersScores[]> => {
 
 const fetchSprite$ = (): Observable<{
     path: string,
-    shape: IShapeTypes[],
+    shapes: IShapeTypes[],
     board: string
 }> => {
     return fetchFromApi$<{
         path: string,
-        shape: IShapeTypes[],
+        shapes: IShapeTypes[],
         board: string
     }>(`sprites`)
 }

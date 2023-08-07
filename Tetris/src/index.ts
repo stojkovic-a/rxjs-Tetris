@@ -1,6 +1,8 @@
-import { Observable, concatMap, fromEvent, map, take, tap, timer } from "rxjs";
+import { Observable, concatMap, fromEvent, map, switchMap, take, tap, timer, toArray } from "rxjs";
 import { Game } from "./game";
 import { fetchSprite$ } from "./services/apiServices"
+import { shapeSpawner } from "./services/shapeSpawner";
+import { loadShapeSprites$ } from "./services/imageLoader";
 
 fromEvent(window, "load").subscribe(() => {
     const canvas = document.createElement("canvas");
@@ -15,36 +17,33 @@ fromEvent(window, "load").subscribe(() => {
 
 });
 
-fetchSprite$().pipe(
-).subscribe(x => console.log(x))
 
+// console.log("aaa")
+// shapeSpawner().pipe(
+//     switchMap(num => loadShapeSprites$().pipe(
+//         toArray(),
+//         map(shapeImagesArray => [shapeImagesArray, num])
+//     )),
+// ).subscribe((a)=>
+//     console.log("ccc")
+// )
 
+// console.log("bbb")
 
+console.log('ccccccccccc')
+shapeSpawner().pipe(
+    switchMap(num => loadShapeSprites$().pipe(
+      toArray(), // Collect all emitted values into an array
+      map(shapeImagesArray => {console.log(shapeImagesArray);return[shapeImagesArray, num]}) // Combine with the num value
+    )),
+    map(([shapeImagesArray, num]) => {
+      if (num === 0) {
+        console.log('aaaaa')
+      }
+      // Handle other cases or return value
+    })
+  ).subscribe(shape => {
+    console.log("wot")
+  });
 
-import { interval } from 'rxjs';
-
-function decreasingIntervalObservable(minInterval: number, formula: (iteration: number) => number): Observable<number> {
-    return interval(minInterval).pipe(
-        map((iteration:number) => formula(iteration))
-    );
-}
-
-// Example of a decreasing interval formula: dt = initialInterval / (iteration + 1)
-const formula = (iteration: number) => 20000 / (iteration + 1);
-const startInterval =50; // Initial interval in milliseconds
-
-const decreasingInterval$ = decreasingIntervalObservable(startInterval, formula);
-
-decreasingInterval$.subscribe(intervalDuration => {
-    console.log('Interval Duration:', intervalDuration);
-});
-
-
-const test$ = decreasingInterval$.pipe(
-    concatMap(vreme => timer(vreme))
-)
-
-test$.subscribe(() => {
-    console.log("IDE GAS");
-});
-
+console.log('ddddd')

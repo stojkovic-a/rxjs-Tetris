@@ -4,7 +4,7 @@ import { IKeysDown } from "../interfaces/IKeysDown";
 import { drawCenteredText, drawText } from "../services/renderServices";
 import { Component } from "./component";
 
-export class Score extends Component {
+export class Overlay extends Component {
     onCreate(): void {
 
     }
