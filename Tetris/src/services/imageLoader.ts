@@ -17,7 +17,7 @@ export const loadBackgroundImage$ = (): Observable<HTMLImageElement> => {
 }
 
 
-export const loadShapeSprites$ = (): Observable<HTMLImageElement> => {
+export const loadShapeSprites$ = (): Observable<{type:string,img:HTMLImageElement}> => {
     return from(fetchSprite$()).pipe(
         mergeMap((sprites) => {
             const shapePaths=sprites.shapes.map(shape=> sprites.path+shape.image);
@@ -28,8 +28,8 @@ export const loadShapeSprites$ = (): Observable<HTMLImageElement> => {
                 shapeImages.push(img1);
             })
             return fromEvent(shapeImages,'load').pipe(
-                map((e)=>{
-                    return e.target as HTMLImageElement
+                map((e,index)=>{
+                    return {type:sprites.shapes[index].image.replace(".png",""),img: e.target as HTMLImageElement}
                 })
             )
         })

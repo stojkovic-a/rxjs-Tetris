@@ -36,3 +36,6 @@ export const INITIAL_GAME_STATE={
         highscore:0
     }
 }
+
+export const MAXIMUM_DELTA_TIME = 1 / 30;
+export const GAME_SPEED=1;

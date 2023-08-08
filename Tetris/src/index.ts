@@ -1,7 +1,6 @@
-import { Observable, concatMap, fromEvent, map, switchMap, take, tap, timer, toArray } from "rxjs";
+import { Observable, catchError, concatMap, fromEvent, map, switchMap, take, tap, timer, toArray } from "rxjs";
 import { Game } from "./game";
 import { fetchSprite$ } from "./services/apiServices"
-import { shapeSpawner } from "./services/shapeSpawner";
 import { loadShapeSprites$ } from "./services/imageLoader";
 
 fromEvent(window, "load").subscribe(() => {
@@ -30,20 +29,40 @@ fromEvent(window, "load").subscribe(() => {
 
 // console.log("bbb")
 
-console.log('ccccccccccc')
-shapeSpawner().pipe(
-    switchMap(num => loadShapeSprites$().pipe(
-      toArray(), // Collect all emitted values into an array
-      map(shapeImagesArray => {console.log(shapeImagesArray);return[shapeImagesArray, num]}) // Combine with the num value
-    )),
-    map(([shapeImagesArray, num]) => {
-      if (num === 0) {
-        console.log('aaaaa')
-      }
-      // Handle other cases or return value
-    })
-  ).subscribe(shape => {
-    console.log("wot")
-  });
+// console.log('ccccccccccc')
+// shapeSpawner().pipe(
+//     switchMap(num => loadShapeSprites$().pipe(
+//       toArray(), // Collect all emitted values into an array
+//       map(shapeImagesArray => {return[shapeImagesArray, num]}),
+//       catchError(error => {
+//         console.error('Error:', error);
+//         return null; // Return an empty observable to handle the error
+//       })
+//       )),
+//     map(([shapeImagesArray, num]) => {
+//       if (num === 0) {
+//         console.log('aaaaa')
+//       }
+//       // Handle other cases or return value
+//     })
+//   ).subscribe(shape => {
+//     console.log("wot")
+//   });
 
-console.log('ddddd')
+// console.log('ddddd')
+
+
+let sprites:any = [];
+
+loadShapeSprites$().
+pipe(
+
+)
+.subscribe(
+    (x)=>{
+        console.log(x);
+        sprites.push(x);
+    }
+);
+
+console.log(sprites);

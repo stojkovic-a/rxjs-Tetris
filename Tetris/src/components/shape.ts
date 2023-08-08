@@ -110,16 +110,16 @@ export class ShapeI extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING) {
-            if (keysDown.keys[0] === "ArrowUp") {
+            if (keysDown['ArrowUp'] ) {
                 this.rotate();
                 return 0;
             } else
-                if (keysDown.keys[0] === "ArrowDown") {
+                if (keysDown["ArrowDown"]) {
                     if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
                         this.onResize(this.bgBound.width, this.bgBound.height);
                         this.render();
-                        return 0;
+                        return -1;
                     } else {
                         const { check, num } = this.board.tryAdd(this.posX, this.posY, this.colisionDetectionMatrix);
                         if (!check) throw new Error("Impossible position");
@@ -128,25 +128,25 @@ export class ShapeI extends Shape {
                         return num;
                     }
                 } else
-                    if (keysDown.keys[0] === "ArrowLeft") {
+                    if (keysDown["ArrowLeft"]) {
                         if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
                             this.onResize(this.bgBound.width, this.bgBound.height);
                             this.render();
                         }
                     } else
-                        if (keysDown.keys[0] === "ArrowRight") {
+                        if (keysDown["ArrowRight"]) {
                             if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
                                 this.onResize(this.bgBound.width, this.bgBound.height);
                                 this.render();
                             }
                         } else
-                            if (keysDown.keys[0] === 'Space') {
+                            if (keysDown['Space']) {
                                 let num = 0
                                 do {
-                                    num = this.update(0, { keys: ["ArrowDown"] });
-                                } while (num === 0);
+                                    num = this.update(0, { keys: ["ArrowDown"] ,["ArrowDown"]:true});
+                                } while (num === -1);
                                 return num;
                             }
             return -1;
