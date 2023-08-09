@@ -1,12 +1,19 @@
+import { sample } from "rxjs";
 import { IBoolNumber } from "../interfaces/IBoolNumber";
 import { IGameState } from "../interfaces/IGameState";
 import { IKeysDown } from "../interfaces/IKeysDown";
+import { loadShapeSprites$ } from "../services/imageLoader";
 import { Component } from "./component";
+import { Block, Shape } from "./shape";
 
 export class Board extends Component {
     private _sizeX: number;
     private _sizeY: number;
-    private _board: Boolean[][]
+    private _board: Boolean[][];
+    private _blocks: Block[][];
+    // private sprites: { type: string, img: HTMLImageElement }[] = [];
+    private images: Map<string, HTMLImageElement> = new Map();
+
 
 
     constructor(
@@ -21,22 +28,58 @@ export class Board extends Component {
         for (let i = 0; i < this._sizeY; i++) {
             for (let j = 0; j < this._sizeX; j++) {
                 this._board[i][j] = false;
+                this._blocks[i][j] = null;
             }
         }
         for (let i = 0; i < this._sizeX; i++) {
             this._board[this._sizeY][i] = true;
         }
+
+        const sprites: { type: string, img: HTMLImageElement }[] = [];
+
+        loadShapeSprites$().
+            pipe(
+
+        )
+            .subscribe(
+                (x) => {
+                    console.log(x);
+                    sprites.push(x);
+                }
+            );
+
+
+        sprites.map(sprite => {
+            this.images.set(sprite.type, sprite.img);
+        });
+
     }
+
     onCreate(): void {
     }
 
     onResize(newWidth: number, newHeight: number): void {
+        for (let i = 0; i < this._blocks.length; i++) {
+            for (let j = 0; j < this._blocks[0].length; j++) {
+                if (this._blocks[i][j] !== null) {
+                    this._blocks[i][j].onResize(newWidth,newHeight);
+                }
+            }
+        }
     }
 
     update(delta: number, keysDown: IKeysDown): void {
     }
 
     render(): void {
+        for (let i = 0; i < this._blocks.length; i++) {
+            for (let j = 0; j < this._blocks[0].length; j++) {
+                if (this._blocks[i][j] !== null) {
+                    this._blocks[i][j].render();
+                }
+            }
+        }
+
     }
 
     tryPosition(posX: number, posY: number, mat: number[][]): boolean {
@@ -79,7 +122,7 @@ export class Board extends Component {
         return canAdd;
     }
 
-    tryAdd(posX: number, posY: number, mat: number[][]): IBoolNumber {
+    tryAdd(shape:Shape,posX: number, posY: number, mat: number[][]): IBoolNumber {
         const sizeY = mat.length;
         const sizeX = mat[0].length;
         if (this.canAdd) {
@@ -90,6 +133,7 @@ export class Board extends Component {
                     }
                 }
             }
+            this.switchShapeWithBlocks(shape);
             const numRemoved = this.removeFullRows();
             return { check: true, num: numRemoved }
         }
@@ -121,11 +165,13 @@ export class Board extends Component {
         for (let i = removedRow; i > 0; i--) {
             for (let j = 0; j < this._sizeX; j++) {
                 this._board[i][j] = this._board[i - 1][j];
+                this._blocks[i][j]=this._blocks[i-1][j];
             }
         }
 
         for (let i = 0; i < this._sizeX; i++) {
             this._board[0][i] = false;
+            this._blocks[0][i]=null;
         }
     }
 
@@ -143,4 +189,26 @@ export class Board extends Component {
         return this._sizeY;
     }
 
+    switchShapeWithBlocks(shape: Shape) {
+        for (let i = 0; i < shape.colisionDetectionMatrix.length; i++) {
+            for (let j = 0; j < shape.colisionDetectionMatrix[0].length; j++) {
+                if (shape.colisionDetectionMatrix[i][j] === 1) {
+                    this._blocks[i][j] = new Block(
+                        this.ctx,
+                        this.gameState,
+                        this.images.get(shape.block.toString() + 'block'),
+                        shape.block,
+                        0,
+                        false,
+                        this,
+                        shape.bgBound,
+                        shape.posX,
+                        shape.posY,
+                        shape.block.toString());
+                        this._blocks[i][j].render();
+                }
+            }
+        }
+
+    }
 }

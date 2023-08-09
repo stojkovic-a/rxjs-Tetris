@@ -47,6 +47,34 @@
             {
                 "type":"Z",
                 "image":"Z.png"
+            },
+            {
+                "type":"Iblock",
+                "image":"Iblock.png"
+            },
+            {
+                "type":"Jblock",
+                "image":"Jblock.png"
+            },
+            {
+                "type":"Lblock",
+                "image":"Lblock.png"
+            },
+            {
+                "type":"Oblock",
+                "image":"Oblock.png"
+            },
+            {
+                "type":"Sblock",
+                "image":"Sblock.png"
+            },
+            {
+                "type":"Tblock",
+                "image":"Tblock.png"
+            },
+            {
+                "type":"Zblock",
+                "image":"Zblock.png"
             }
         ],
         "board":"Board.png"

@@ -7,12 +7,13 @@ import { Highscores } from "./components/highscores";
 import { Overlay } from "./components/overlay";
 import { Background } from "./components/background";
 import { IGameState } from "./interfaces/IGameState";
-import { GAME_SPEED, INITIAL_GAME_STATE, MIN_INTERVAL_MS } from "./config";
+import { BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH, GAME_SPEED, INITIAL_GAME_STATE, MIN_INTERVAL_MS } from "./config";
 import { decreasingIntervalObservable, formula } from "./services/gameTicker";
 // import { shapeSpawner } from "./services/shapeSpawner";
 import { initializeMainLoop } from "./services/renderLoop";
 import { IKeysDown } from "./interfaces/IKeysDown";
 import { putPlayerProfile } from "./services/apiServices";
+import { Board } from "./components/board";
 // import { getKeysDown } from "./services/keybordInputService";
 export class Game {
     private readonly canvas: HTMLCanvasElement;
@@ -25,6 +26,7 @@ export class Game {
     private enterUsername: EnterUsername;
     private highscores: Highscores;
     private overlay: Overlay
+    private board:Board;
 
 
     private shapeSpawner$: Observable<number>;
@@ -43,6 +45,7 @@ export class Game {
         this.enterUsername = new EnterUsername(this.ctx, this.gameState);
         this.highscores = new Highscores(this.ctx, this.gameState);
         this.overlay = new Overlay(this.ctx, this.gameState);
+        this.board=new Board(this.ctx,this.gameState,BOARD_BLOCKS_HEIGHt,BOARD_BLOCKS_WIDTH);
 
         // this.gameTick$ = decreasingIntervalObservable(MIN_INTERVAL_MS, formula);
         // this.shapeSpawner$ = shapeSpawner();
@@ -60,7 +63,8 @@ export class Game {
         this.mainLoop$.subscribe(
             ([deltaTime,keysDown])=>{
                 const scaledDeltaTime=deltaTime*GAME_SPEED;
-                
+                this.update(scaledDeltaTime,keysDown);
+                this.render();
             }
         )
 
@@ -100,6 +104,7 @@ export class Game {
         this.enterUsername.onResize(newWidth,newHeight);
         this.highscores.onResize(newWidth,newHeight);
         this.overlay.onResize(newWidth,newHeight);
+        this.board.onResize(newWidth,newHeight);
     }
 
     render(){
@@ -113,6 +118,7 @@ export class Game {
         this.overlay.render();
         this.highscores.render();
         this.enterUsername.render();
+        this.board.render();
     }
 
     update(deltaTime:number,keysDown:IKeysDown){
@@ -123,6 +129,7 @@ export class Game {
         this.overlay.update(deltaTime,keysDown);
         this.enterUsername.update(deltaTime,keysDown);
         this.highscores.update(deltaTime,keysDown);
+        this.board.update(deltaTime,keysDown);
 
         this.updateLogic(deltaTime,keysDown);
     }
