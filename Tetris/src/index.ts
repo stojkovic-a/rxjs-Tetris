@@ -1,7 +1,9 @@
-import { Observable, catchError, concatMap, fromEvent, map, switchMap, take, tap, timer, toArray } from "rxjs";
+import { Observable, catchError, concatMap, expand, filter, fromEvent, map, of, switchMap, take, tap, timer, toArray } from "rxjs";
 import { Game } from "./game";
 import { fetchSprite$ } from "./services/apiServices"
 import { loadShapeSprites$ } from "./services/imageLoader";
+import { IFrameData } from "./interfaces/IFrameData";
+import { MAXIMUM_DELTA_TIME } from "./config";
 
 fromEvent(window, "load").subscribe(() => {
     const canvas = document.createElement("canvas");
@@ -52,17 +54,30 @@ fromEvent(window, "load").subscribe(() => {
 // console.log('ddddd')
 
 
-let sprites:any = [];
+// let sprites: any = [];
 
-loadShapeSprites$().
-pipe(
+// loadShapeSprites$().
+//     pipe(
 
-)
-.subscribe(
-    (x)=>{
-        console.log(x);
-        sprites.push(x);
-    }
-);
+// )
+//     .subscribe(
+//         (x) => {
+//             console.log(x);
+//             sprites.push(x);
+//         }
+//     );
 
-console.log(sprites);
+// console.log(sprites);
+
+
+// const keysDown$ = fromEvent(document, 'keydown').pipe(
+//     map((event: KeyboardEvent) => {
+//         return { code: event.code, key: event.key };
+//     })).subscribe(
+//         x => console.log(x)
+//     )
+
+
+
+
+

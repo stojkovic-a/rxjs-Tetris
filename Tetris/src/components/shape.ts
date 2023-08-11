@@ -9,6 +9,7 @@ import { IRectangle } from "../interfaces/IRectangle";
 import { BACKGROUND_ASPECT_RATIO, BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH, BOARD_BORDER_SHIFT_X, BOARD_BORDER_SHIFT_Y } from "../config";
 import { drawImage } from "../services/renderServices";
 import { GamePhase } from "../enums/GamePhase";
+import { Game } from "../game";
 export abstract class Shape extends Component {
 
     public readonly block: Shapes;
@@ -45,6 +46,7 @@ export abstract class Shape extends Component {
         this.tickTime = tickTime;
         this.colisionDetectionMatrix = cdm;
         this.moving = moving;
+        Game.canSpawn.val = !moving;
         this.board = board;
         this.bgBound = bgBounds
 
@@ -52,9 +54,10 @@ export abstract class Shape extends Component {
         this.shapeBound.y = bgBounds.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
         this.shapeBound.width = this.colisionDetectionMatrix.length * bgBounds.width / BOARD_BLOCKS_WIDTH;
         this.shapeBound.height = this.colisionDetectionMatrix[0].length * bgBounds.height / BOARD_BLOCKS_HEIGHt;
+        this.onCreate();
     }
 
-    abstract onCreate(): void
+    abstract onCreate(): boolean
 
     abstract onResize(newWidth: number, newHeight: number): void
 
@@ -95,7 +98,9 @@ export class ShapeI extends Shape {
 
     }
 
-    onCreate(): void {
+    onCreate(): boolean {
+        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+        return canSpawn
     }
 
     onResize(newWidth: number, newHeight: number): void {
@@ -127,10 +132,11 @@ export class ShapeI extends Shape {
                         this.render();
                         return -1;
                     } else {
-                        const { check, num } = this.board.tryAdd(this,this.posX, this.posY, this.colisionDetectionMatrix);
+                        const { check, num } = this.board.tryAdd(this, this.posX, this.posY, this.colisionDetectionMatrix);
                         if (!check) throw new Error("Impossible position");
                         this.moving = false;
                         this.tickTime = Infinity;
+                        Game.canSpawn.val = true;
                         return num;
                     }
                 } else
@@ -153,6 +159,9 @@ export class ShapeI extends Shape {
                                 do {
                                     num = this.update(0, { keys: ["ArrowDown"], ["ArrowDown"]: true });
                                 } while (num === -1);
+                                this.moving = false;
+                                this.tickTime = Infinity;
+                                Game.canSpawn.val = true;
                                 return num;
                             }
             return -1;
@@ -231,9 +240,11 @@ export class ShapeT extends Shape {
         );
     }
 
-    onCreate(): void {
-    }
 
+    onCreate(): boolean {
+        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+        return canSpawn
+    }
     onResize(newWidth: number, newHeight: number): void {
         const bgdWidth = newHeight * BACKGROUND_ASPECT_RATIO;
         const bgHeight = newHeight;
@@ -252,36 +263,50 @@ export class ShapeT extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
-            if (keysDown.keys[0] === "ArrowUp") {
+            if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
             } else
-                if (keysDown.keys[0] === "ArrowDown") {
+                if (keysDown["ArrowDown"]) {
                     if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
                         this.onResize(this.bgBound.width, this.bgBound.height);
                         this.render();
-                        return 0;
+                        return -1;
                     } else {
-                        const { check, num } = this.board.tryAdd(this,this.posX, this.posY, this.colisionDetectionMatrix);
+                        const { check, num } = this.board.tryAdd(this, this.posX, this.posY, this.colisionDetectionMatrix);
                         if (!check) throw new Error("Impossible position");
+                        this.moving = false;
+                        this.tickTime = Infinity;
+                        Game.canSpawn.val = true;
                         return num;
                     }
                 } else
-                    if (keysDown.keys[0] === "ArrowLeft") {
+                    if (keysDown["ArrowLeft"]) {
                         if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
                             this.onResize(this.bgBound.width, this.bgBound.height);
                             this.render();
                         }
                     } else
-                        if (keysDown.keys[0] === "ArrowRight") {
+                        if (keysDown["ArrowRight"]) {
                             if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
                                 this.onResize(this.bgBound.width, this.bgBound.height);
                                 this.render();
                             }
-                        }
+                        } else
+                            if (keysDown['Space']) {
+                                let num = 0
+                                do {
+                                    num = this.update(0, { keys: ["ArrowDown"], ["ArrowDown"]: true });
+                                } while (num === -1);
+                                this.moving = false;
+                                this.tickTime = Infinity;
+                                Game.canSpawn.val = true;
+                                return num;
+                            }
+            return -1;
         }
     }
 
@@ -394,7 +419,10 @@ export class ShapeO extends Shape {
         );
     }
 
-    onCreate(): void {
+
+    onCreate(): boolean {
+        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+        return canSpawn
     }
 
     onResize(newWidth: number, newHeight: number): void {
@@ -415,36 +443,50 @@ export class ShapeO extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
-            if (keysDown.keys[0] === "ArrowUp") {
+            if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
             } else
-                if (keysDown.keys[0] === "ArrowDown") {
+                if (keysDown["ArrowDown"]) {
                     if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
                         this.onResize(this.bgBound.width, this.bgBound.height);
                         this.render();
-                        return 0;
+                        return -1;
                     } else {
-                        const { check, num } = this.board.tryAdd(this,this.posX, this.posY, this.colisionDetectionMatrix);
+                        const { check, num } = this.board.tryAdd(this, this.posX, this.posY, this.colisionDetectionMatrix);
                         if (!check) throw new Error("Impossible position");
+                        this.moving = false;
+                        this.tickTime = Infinity;
+                        Game.canSpawn.val = true;
                         return num;
                     }
                 } else
-                    if (keysDown.keys[0] === "ArrowLeft") {
+                    if (keysDown["ArrowLeft"]) {
                         if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
                             this.onResize(this.bgBound.width, this.bgBound.height);
                             this.render();
                         }
                     } else
-                        if (keysDown.keys[0] === "ArrowRight") {
+                        if (keysDown["ArrowRight"]) {
                             if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
                                 this.onResize(this.bgBound.width, this.bgBound.height);
                                 this.render();
                             }
-                        }
+                        } else
+                            if (keysDown['Space']) {
+                                let num = 0
+                                do {
+                                    num = this.update(0, { keys: ["ArrowDown"], ["ArrowDown"]: true });
+                                } while (num === -1);
+                                this.moving = false;
+                                this.tickTime = Infinity;
+                                Game.canSpawn.val = true;
+                                return num;
+                            }
+            return -1;
         }
     }
 
@@ -491,7 +533,10 @@ export class ShapeS extends Shape {
         );
     }
 
-    onCreate(): void {
+
+    onCreate(): boolean {
+        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+        return canSpawn
     }
 
     onResize(newWidth: number, newHeight: number): void {
@@ -513,36 +558,50 @@ export class ShapeS extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
-            if (keysDown.keys[0] === "ArrowUp") {
+            if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
             } else
-                if (keysDown.keys[0] === "ArrowDown") {
+                if (keysDown["ArrowDown"]) {
                     if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
                         this.onResize(this.bgBound.width, this.bgBound.height);
                         this.render();
-                        return 0;
+                        return -1;
                     } else {
-                        const { check, num } = this.board.tryAdd(this,this.posX, this.posY, this.colisionDetectionMatrix);
+                        const { check, num } = this.board.tryAdd(this, this.posX, this.posY, this.colisionDetectionMatrix);
                         if (!check) throw new Error("Impossible position");
+                        this.moving = false;
+                        this.tickTime = Infinity;
+                        Game.canSpawn.val = true;
                         return num;
                     }
                 } else
-                    if (keysDown.keys[0] === "ArrowLeft") {
+                    if (keysDown["ArrowLeft"]) {
                         if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
                             this.onResize(this.bgBound.width, this.bgBound.height);
                             this.render();
                         }
                     } else
-                        if (keysDown.keys[0] === "ArrowRight") {
+                        if (keysDown["ArrowRight"]) {
                             if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
                                 this.onResize(this.bgBound.width, this.bgBound.height);
                                 this.render();
                             }
-                        }
+                        } else
+                            if (keysDown['Space']) {
+                                let num = 0
+                                do {
+                                    num = this.update(0, { keys: ["ArrowDown"], ["ArrowDown"]: true });
+                                } while (num === -1);
+                                this.moving = false;
+                                this.tickTime = Infinity;
+                                Game.canSpawn.val = true;
+                                return num;
+                            }
+            return -1;
         }
     }
 
@@ -623,7 +682,10 @@ export class ShapeZ extends Shape {
         );
     }
 
-    onCreate(): void {
+
+    onCreate(): boolean {
+        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+        return canSpawn
     }
 
     onResize(newWidth: number, newHeight: number): void {
@@ -645,36 +707,50 @@ export class ShapeZ extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
-            if (keysDown.keys[0] === "ArrowUp") {
+            if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
             } else
-                if (keysDown.keys[0] === "ArrowDown") {
+                if (keysDown["ArrowDown"]) {
                     if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
                         this.onResize(this.bgBound.width, this.bgBound.height);
                         this.render();
-                        return 0;
+                        return -1;
                     } else {
-                        const { check, num } = this.board.tryAdd(this,this.posX, this.posY, this.colisionDetectionMatrix);
+                        const { check, num } = this.board.tryAdd(this, this.posX, this.posY, this.colisionDetectionMatrix);
                         if (!check) throw new Error("Impossible position");
+                        this.moving = false;
+                        this.tickTime = Infinity;
+                        Game.canSpawn.val = true;
                         return num;
                     }
                 } else
-                    if (keysDown.keys[0] === "ArrowLeft") {
+                    if (keysDown["ArrowLeft"]) {
                         if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
                             this.onResize(this.bgBound.width, this.bgBound.height);
                             this.render();
                         }
                     } else
-                        if (keysDown.keys[0] === "ArrowRight") {
+                        if (keysDown["ArrowRight"]) {
                             if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
                                 this.onResize(this.bgBound.width, this.bgBound.height);
                                 this.render();
                             }
-                        }
+                        } else
+                            if (keysDown['Space']) {
+                                let num = 0
+                                do {
+                                    num = this.update(0, { keys: ["ArrowDown"], ["ArrowDown"]: true });
+                                } while (num === -1);
+                                this.moving = false;
+                                this.tickTime = Infinity;
+                                Game.canSpawn.val = true;
+                                return num;
+                            }
+            return -1;
         }
     }
 
@@ -753,7 +829,10 @@ export class ShapeL extends Shape {
         );
     }
 
-    onCreate(): void {
+
+    onCreate(): boolean {
+        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+        return canSpawn
     }
 
     onResize(newWidth: number, newHeight: number): void {
@@ -775,36 +854,50 @@ export class ShapeL extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
-            if (keysDown.keys[0] === "ArrowUp") {
+            if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
             } else
-                if (keysDown.keys[0] === "ArrowDown") {
+                if (keysDown["ArrowDown"]) {
                     if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
                         this.onResize(this.bgBound.width, this.bgBound.height);
                         this.render();
-                        return 0;
+                        return -1;
                     } else {
-                        const { check, num } = this.board.tryAdd(this,this.posX, this.posY, this.colisionDetectionMatrix);
+                        const { check, num } = this.board.tryAdd(this, this.posX, this.posY, this.colisionDetectionMatrix);
                         if (!check) throw new Error("Impossible position");
+                        this.moving = false;
+                        this.tickTime = Infinity;
+                        Game.canSpawn.val = true;
                         return num;
                     }
                 } else
-                    if (keysDown.keys[0] === "ArrowLeft") {
+                    if (keysDown["ArrowLeft"]) {
                         if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
                             this.onResize(this.bgBound.width, this.bgBound.height);
                             this.render();
                         }
                     } else
-                        if (keysDown.keys[0] === "ArrowRight") {
+                        if (keysDown["ArrowRight"]) {
                             if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
                                 this.onResize(this.bgBound.width, this.bgBound.height);
                                 this.render();
                             }
-                        }
+                        } else
+                            if (keysDown['Space']) {
+                                let num = 0
+                                do {
+                                    num = this.update(0, { keys: ["ArrowDown"], ["ArrowDown"]: true });
+                                } while (num === -1);
+                                this.moving = false;
+                                this.tickTime = Infinity;
+                                Game.canSpawn.val = true;
+                                return num;
+                            }
+            return -1;
         }
     }
 
@@ -917,7 +1010,10 @@ export class ShapeJ extends Shape {
         );
     }
 
-    onCreate(): void {
+
+    onCreate(): boolean {
+        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+        return canSpawn
     }
 
     onResize(newWidth: number, newHeight: number): void {
@@ -939,36 +1035,50 @@ export class ShapeJ extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
-            if (keysDown.keys[0] === "ArrowUp") {
+            if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
             } else
-                if (keysDown.keys[0] === "ArrowDown") {
+                if (keysDown["ArrowDown"]) {
                     if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
                         this.onResize(this.bgBound.width, this.bgBound.height);
                         this.render();
-                        return 0;
+                        return -1;
                     } else {
-                        const { check, num } = this.board.tryAdd(this,this.posX, this.posY, this.colisionDetectionMatrix);
+                        const { check, num } = this.board.tryAdd(this, this.posX, this.posY, this.colisionDetectionMatrix);
                         if (!check) throw new Error("Impossible position");
+                        this.moving = false;
+                        this.tickTime = Infinity;
+                        Game.canSpawn.val = true;
                         return num;
                     }
                 } else
-                    if (keysDown.keys[0] === "ArrowLeft") {
+                    if (keysDown["ArrowLeft"]) {
                         if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
                             this.onResize(this.bgBound.width, this.bgBound.height);
                             this.render();
                         }
                     } else
-                        if (keysDown.keys[0] === "ArrowRight") {
+                        if (keysDown["ArrowRight"]) {
                             if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
                                 this.onResize(this.bgBound.width, this.bgBound.height);
                                 this.render();
                             }
-                        }
+                        } else
+                            if (keysDown['Space']) {
+                                let num = 0
+                                do {
+                                    num = this.update(0, { keys: ["ArrowDown"], ["ArrowDown"]: true });
+                                } while (num === -1);
+                                this.moving = false;
+                                this.tickTime = Infinity;
+                                Game.canSpawn.val = true;
+                                return num;
+                            }
+            return -1;
         }
     }
 
@@ -1083,9 +1193,12 @@ export class Block extends Shape {
         this.type = type;
     }
 
-    onCreate(): void {
 
+    onCreate(): boolean {
+        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+        return canSpawn
     }
+
     onResize(newWidth: number, newHeight: number): void {
         const bgdWidth = newHeight * BACKGROUND_ASPECT_RATIO;
         const bgHeight = newHeight;

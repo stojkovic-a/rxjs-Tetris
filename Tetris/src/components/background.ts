@@ -48,4 +48,8 @@ export class Background extends Component {
             }
         });
     }
+
+    getRect():IRectangle[]{
+        return this._rect;
+    }
 }

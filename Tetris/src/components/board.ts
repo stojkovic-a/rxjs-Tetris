@@ -5,6 +5,7 @@ import { IKeysDown } from "../interfaces/IKeysDown";
 import { loadShapeSprites$ } from "../services/imageLoader";
 import { Component } from "./component";
 import { Block, Shape } from "./shape";
+import { Game } from "../game";
 
 export class Board extends Component {
     private _sizeX: number;
@@ -13,7 +14,7 @@ export class Board extends Component {
     private _blocks: Block[][];
     // private sprites: { type: string, img: HTMLImageElement }[] = [];
     private images: Map<string, HTMLImageElement> = new Map();
-
+    private canSpawn:Game;
 
 
     constructor(
@@ -25,6 +26,8 @@ export class Board extends Component {
         super(ctx, gameState);
         this._sizeX = x;
         this._sizeY = y;
+        this._board = new Array(y+1).fill([]).map(() => new Array(x).fill(false));
+        this._blocks = new Array(y).fill([]).map(() => new Array(x).fill(null));
         for (let i = 0; i < this._sizeY; i++) {
             for (let j = 0; j < this._sizeX; j++) {
                 this._board[i][j] = false;
@@ -59,6 +62,7 @@ export class Board extends Component {
     }
 
     onResize(newWidth: number, newHeight: number): void {
+        if(this._blocks!==undefined)
         for (let i = 0; i < this._blocks.length; i++) {
             for (let j = 0; j < this._blocks[0].length; j++) {
                 if (this._blocks[i][j] !== null) {
@@ -158,6 +162,8 @@ export class Board extends Component {
                 this.lowerFlyingRows(i);
             }
         }
+        this.gameState.score+=100*numRemoved;
+        this.gameState.player.score+=100*numRemoved;
         return numRemoved;
     }
 

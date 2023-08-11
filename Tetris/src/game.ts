@@ -1,4 +1,4 @@
-import { Observable, debounceTime, fromEvent } from "rxjs";
+import { Observable, Subscription, debounceTime, fromEvent } from "rxjs";
 import { GamePhase } from "./enums/GamePhase";
 import { loadBackgroundImage$, loadShapeSprites$ } from "./services/imageLoader";
 import { Shape, ShapeI } from "./components/shape";
@@ -14,6 +14,8 @@ import { initializeMainLoop } from "./services/renderLoop";
 import { IKeysDown } from "./interfaces/IKeysDown";
 import { putPlayerProfile } from "./services/apiServices";
 import { Board } from "./components/board";
+import { startSpawningShapes } from "./services/shapeSpawner";
+import { IBoolWrapper } from "./interfaces/IBoolWrapper";
 // import { getKeysDown } from "./services/keybordInputService";
 export class Game {
     private readonly canvas: HTMLCanvasElement;
@@ -26,11 +28,13 @@ export class Game {
     private enterUsername: EnterUsername;
     private highscores: Highscores;
     private overlay: Overlay
-    private board:Board;
+    private board: Board;
+    public static canSpawn: IBoolWrapper = { val: false };
 
 
-    private shapeSpawner$: Observable<number>;
-    private mainLoop$:Observable<[number,IKeysDown]>;
+    private shapeSpawner$: Observable<Shape>;
+    private shapeSubscription: Subscription;
+    private mainLoop$: Observable<[number, IKeysDown]>;
     constructor(canvas: HTMLCanvasElement) {
         if (!canvas.getContext) {
             throw new Error("Canvas is not supported in this browser");
@@ -45,11 +49,10 @@ export class Game {
         this.enterUsername = new EnterUsername(this.ctx, this.gameState);
         this.highscores = new Highscores(this.ctx, this.gameState);
         this.overlay = new Overlay(this.ctx, this.gameState);
-        this.board=new Board(this.ctx,this.gameState,BOARD_BLOCKS_HEIGHt,BOARD_BLOCKS_WIDTH);
-
+        this.board = new Board(this.ctx, this.gameState, BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH);
+        Game.canSpawn.val = false;
         // this.gameTick$ = decreasingIntervalObservable(MIN_INTERVAL_MS, formula);
-        // this.shapeSpawner$ = shapeSpawner();
-        this.mainLoop$=initializeMainLoop();
+        this.mainLoop$ = initializeMainLoop();
 
     }
 
@@ -61,9 +64,9 @@ export class Game {
             })
 
         this.mainLoop$.subscribe(
-            ([deltaTime,keysDown])=>{
-                const scaledDeltaTime=deltaTime*GAME_SPEED;
-                this.update(scaledDeltaTime,keysDown);
+            ([deltaTime, keysDown]) => {
+                const scaledDeltaTime = deltaTime * GAME_SPEED;
+                this.update(scaledDeltaTime, keysDown);
                 this.render();
             }
         )
@@ -71,26 +74,50 @@ export class Game {
 
         loadBackgroundImage$().subscribe((img) => {
             this.background = new Background(this.ctx, this.gameState, img);
+            //  this.shapeSpawner$ = startSpawningShapes(this.ctx, this.gameState,Game.canSpawn,this.board,this.background.getRect()[0]);
         })
 
-        // this.keyboardInput$ = getKeysDown();
+        if (this.background)
+            this.shapeSpawner$ = startSpawningShapes(this.ctx, this.gameState, Game.canSpawn, this.board, this.background.getRect()[0]);
+
+
     }
 
     startRound() {
+        this.shapeSubscription = this.shapeSpawner$.subscribe(
+            (shape) => {
+                if (shape.onCreate() === false) {
+                    this.die();
+                }
+                this.shapes.push();
+            }
+        )
+        Game.canSpawn.val = true;
 
+        this.gameState.score = 0;
+        this.gameState.player.score = 0;
+        this.gameState.currentState = GamePhase.PLAYING;
     }
 
 
-    updateLogic(deltaTime:number,keysDown:IKeysDown){
-        switch(this.gameState.currentState){
+    updateLogic(deltaTime: number, keysDown: IKeysDown) {
+        switch (this.gameState.currentState) {
             case GamePhase.PLAYING:
                 break;
             case GamePhase.READY:
-                break;
-            case GamePhase.GAME_OVER:
-                if(keysDown['Space']){
+                if (keysDown['Space']) {
                     this.startRound();
                 }
+                Game.canSpawn.val = false;
+                break;
+            case GamePhase.GAME_OVER:
+                Game.canSpawn.val = false;
+                if (keysDown['Space']) {
+                    this.startRound();
+                }
+                break;
+            case GamePhase.ENTER_NAME:
+                Game.canSpawn.val = false;
                 break;
         }
     }
@@ -99,50 +126,52 @@ export class Game {
         this.canvas.height = newHeight;
         this.ctx.imageSmoothingEnabled = false;
 
-        this.background.onResize(newWidth,newHeight);
-        this.shapes.forEach((shape)=>shape.onResize(newWidth,newHeight));
-        this.enterUsername.onResize(newWidth,newHeight);
-        this.highscores.onResize(newWidth,newHeight);
-        this.overlay.onResize(newWidth,newHeight);
-        this.board.onResize(newWidth,newHeight);
+        this.background.onResize(newWidth, newHeight);
+        this.shapes.forEach((shape) => shape.onResize(newWidth, newHeight));
+        this.enterUsername.onResize(newWidth, newHeight);
+        this.highscores.onResize(newWidth, newHeight);
+        this.overlay.onResize(newWidth, newHeight);
+        this.board.onResize(newWidth, newHeight);
     }
 
-    render(){
-        const screenWidth=this.ctx.canvas.width;
-        const screenHeight=this.ctx.canvas.height;
+    render() {
+        const screenWidth = this.ctx.canvas.width;
+        const screenHeight = this.ctx.canvas.height;
 
-        this.ctx.clearRect(0,0,screenWidth,screenHeight);
+        this.ctx.clearRect(0, 0, screenWidth, screenHeight);
 
-        this.background.render();
-        this.shapes.forEach(shape=>shape.render());
+        if (this.background)
+            this.background.render();
+        this.shapes.forEach(shape => shape.render());
         this.overlay.render();
         this.highscores.render();
         this.enterUsername.render();
         this.board.render();
     }
 
-    update(deltaTime:number,keysDown:IKeysDown){
-        this.background.update(deltaTime,keysDown);
+    update(deltaTime: number, keysDown: IKeysDown) {
+        if (this.background)
+            this.background.update(deltaTime, keysDown);
 
-        this.shapes.forEach(shape=>shape.update(deltaTime,keysDown));
+        this.shapes.forEach(shape => shape.update(deltaTime, keysDown));
 
-        this.overlay.update(deltaTime,keysDown);
-        this.enterUsername.update(deltaTime,keysDown);
-        this.highscores.update(deltaTime,keysDown);
-        this.board.update(deltaTime,keysDown);
+        this.overlay.update(deltaTime, keysDown);
+        this.enterUsername.update(deltaTime, keysDown);
+        this.highscores.update(deltaTime, keysDown);
+        this.board.update(deltaTime, keysDown);
 
-        this.updateLogic(deltaTime,keysDown);
+        this.updateLogic(deltaTime, keysDown);
     }
 
-    die():void{
-        this.shapes=[];
+    die(): void {
+        this.shapes = [];
+        this.shapeSubscription.unsubscribe();
+        this.gameState.currentState = GamePhase.GAME_OVER;
 
-        this.gameState.currentState=GamePhase.GAME_OVER;
-
-        if(this.gameState.score>this.gameState.player.highscore){
-            this.gameState.player.highscore=this.gameState.score;
-            putPlayerProfile(this.gameState.player).then((player)=>{
-                this.gameState.player={...player,score:0};
+        if (this.gameState.score > this.gameState.player.highscore) {
+            this.gameState.player.highscore = this.gameState.score;
+            putPlayerProfile(this.gameState.player).then((player) => {
+                this.gameState.player = { ...player, score: 0 };
             });
         }
     }
