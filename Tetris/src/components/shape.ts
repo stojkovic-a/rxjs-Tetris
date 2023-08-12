@@ -50,10 +50,12 @@ export abstract class Shape extends Component {
         this.board = board;
         this.bgBound = bgBounds
 
-        this.shapeBound.x = bgBounds.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width;
-        this.shapeBound.y = bgBounds.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-        this.shapeBound.width = this.colisionDetectionMatrix.length * bgBounds.width / BOARD_BLOCKS_WIDTH;
-        this.shapeBound.height = this.colisionDetectionMatrix[0].length * bgBounds.height / BOARD_BLOCKS_HEIGHt;
+        this.shapeBound={
+        x:bgBounds.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width,
+        y : bgBounds.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height,
+        width : this.colisionDetectionMatrix.length * bgBounds.width / BOARD_BLOCKS_WIDTH,
+        height : this.colisionDetectionMatrix[0].length * bgBounds.height / BOARD_BLOCKS_HEIGHt
+        }
         this.onCreate();
     }
 
@@ -99,8 +101,12 @@ export class ShapeI extends Shape {
     }
 
     onCreate(): boolean {
-        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
-        return canSpawn
+        console.log
+        if (this.board) {
+            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            console.log(canSpawn,'log from shape.ts checking it shape can be spawned');
+            return canSpawn
+        }
     }
 
     onResize(newWidth: number, newHeight: number): void {
@@ -113,10 +119,12 @@ export class ShapeI extends Shape {
             width: bgdWidth,
             height: bgHeight
         }
-        this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
-        this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-        this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-        this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        if (this.shapeBound) {
+            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+            this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        }
     }
 
     update(delta: number, keysDown: IKeysDown): number {
@@ -242,8 +250,10 @@ export class ShapeT extends Shape {
 
 
     onCreate(): boolean {
-        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
-        return canSpawn
+        if (this.board) {
+            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            return canSpawn
+        }
     }
     onResize(newWidth: number, newHeight: number): void {
         const bgdWidth = newHeight * BACKGROUND_ASPECT_RATIO;
@@ -255,10 +265,13 @@ export class ShapeT extends Shape {
             width: bgdWidth,
             height: bgHeight
         }
-        this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
-        this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-        this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-        this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+
+        if (this.shapeBound) {
+            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+            this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        }
     }
 
     update(delta: number, keysDown: IKeysDown): number {
@@ -421,8 +434,10 @@ export class ShapeO extends Shape {
 
 
     onCreate(): boolean {
-        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
-        return canSpawn
+        if (this.board) {
+            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            return canSpawn
+        }
     }
 
     onResize(newWidth: number, newHeight: number): void {
@@ -435,10 +450,12 @@ export class ShapeO extends Shape {
             width: bgdWidth,
             height: bgHeight
         }
-        this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
-        this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-        this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-        this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        if (this.shapeBound) {
+            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+            this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        }
     }
 
     update(delta: number, keysDown: IKeysDown): number {
@@ -535,8 +552,10 @@ export class ShapeS extends Shape {
 
 
     onCreate(): boolean {
-        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
-        return canSpawn
+        if (this.board) {
+            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            return canSpawn
+        }
     }
 
     onResize(newWidth: number, newHeight: number): void {
@@ -549,11 +568,12 @@ export class ShapeS extends Shape {
             width: bgdWidth,
             height: bgHeight
         }
-        this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
-        this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-        this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-        this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
-
+        if (this.shapeBound) {
+            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+            this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        }
     }
 
     update(delta: number, keysDown: IKeysDown): number {
@@ -684,8 +704,10 @@ export class ShapeZ extends Shape {
 
 
     onCreate(): boolean {
-        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
-        return canSpawn
+        if (this.board) {
+            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            return canSpawn
+        }
     }
 
     onResize(newWidth: number, newHeight: number): void {
@@ -698,10 +720,12 @@ export class ShapeZ extends Shape {
             width: bgdWidth,
             height: bgHeight
         }
-        this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
-        this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-        this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-        this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        if (this.shapeBound) {    
+            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+            this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        }
 
     }
 
@@ -831,8 +855,10 @@ export class ShapeL extends Shape {
 
 
     onCreate(): boolean {
-        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
-        return canSpawn
+        if (this.board) {
+            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            return canSpawn
+        }
     }
 
     onResize(newWidth: number, newHeight: number): void {
@@ -845,10 +871,12 @@ export class ShapeL extends Shape {
             width: bgdWidth,
             height: bgHeight
         }
-        this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
-        this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-        this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-        this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        if (this.shapeBound) {    
+            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+            this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        }
 
     }
 
@@ -1012,8 +1040,10 @@ export class ShapeJ extends Shape {
 
 
     onCreate(): boolean {
-        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
-        return canSpawn
+        if (this.board) {
+            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            return canSpawn
+        }
     }
 
     onResize(newWidth: number, newHeight: number): void {
@@ -1026,10 +1056,12 @@ export class ShapeJ extends Shape {
             width: bgdWidth,
             height: bgHeight
         }
-        this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
-        this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-        this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-        this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        if (this.shapeBound) {    
+            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+            this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        }
 
     }
 
@@ -1195,8 +1227,10 @@ export class Block extends Shape {
 
 
     onCreate(): boolean {
-        const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
-        return canSpawn
+        if (this.board) {
+            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            return canSpawn
+        }
     }
 
     onResize(newWidth: number, newHeight: number): void {
@@ -1209,10 +1243,12 @@ export class Block extends Shape {
             width: bgdWidth,
             height: bgHeight
         }
-        this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
-        this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-        this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-        this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        if (this.shapeBound) {    
+            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+            this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+        }
 
     }
 

@@ -29,7 +29,7 @@ export class Game {
     private highscores: Highscores;
     private overlay: Overlay
     private board: Board;
-    public static canSpawn: IBoolWrapper = { val: false };
+    public static canSpawn: IBoolWrapper = { val: true };
 
 
     private shapeSpawner$: Observable<Shape>;
@@ -50,7 +50,7 @@ export class Game {
         this.highscores = new Highscores(this.ctx, this.gameState);
         this.overlay = new Overlay(this.ctx, this.gameState);
         this.board = new Board(this.ctx, this.gameState, BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH);
-        Game.canSpawn.val = false;
+        Game.canSpawn.val = true;
         // this.gameTick$ = decreasingIntervalObservable(MIN_INTERVAL_MS, formula);
         this.mainLoop$ = initializeMainLoop();
 
@@ -75,28 +75,40 @@ export class Game {
         loadBackgroundImage$().subscribe((img) => {
             this.background = new Background(this.ctx, this.gameState, img);
             //  this.shapeSpawner$ = startSpawningShapes(this.ctx, this.gameState,Game.canSpawn,this.board,this.background.getRect()[0]);
+            this.shapeSpawner$ = startSpawningShapes(this.ctx, this.gameState, this.board, this.background.getRect()[0]);
+            // console.log(this.shapeSpawner$);
         })
 
-        if (this.background)
-            this.shapeSpawner$ = startSpawningShapes(this.ctx, this.gameState, Game.canSpawn, this.board, this.background.getRect()[0]);
+        // if (this.background)
+        //     this.shapeSpawner$ = startSpawningShapes(this.ctx, this.gameState, Game.canSpawn, this.board, this.background.getRect()[0]);
 
 
     }
 
     startRound() {
-        this.shapeSubscription = this.shapeSpawner$.subscribe(
-            (shape) => {
-                if (shape.onCreate() === false) {
-                    this.die();
+        // console.log("log from game.ts startRound() line 88");
+        if (this.shapeSpawner$) {
+            // console.log("lof from game.ts startRound() if shapeSpawner$",this.shapeSpawner$);
+            Game.canSpawn.val = true;
+            this.gameState.currentState = GamePhase.PLAYING;
+            // console.log(Game.canSpawn.val);
+            this.shapeSubscription = this.shapeSpawner$.subscribe(
+                (shape) => {
+                     console.log("log from subscribe",shape);
+                    if (shape.onCreate() === false) {
+                        this.die();
+                    }
+                    this.shapes.push(shape);
+                    console.log(shape);
+                    console.log(this.shapes.length);
                 }
-                this.shapes.push();
-            }
-        )
-        Game.canSpawn.val = true;
+            )
 
-        this.gameState.score = 0;
-        this.gameState.player.score = 0;
-        this.gameState.currentState = GamePhase.PLAYING;
+            this.gameState.score = 0;
+            this.gameState.player.score = 0;
+        } else {
+            console.log(":(");
+        }
     }
 
 
@@ -105,10 +117,10 @@ export class Game {
             case GamePhase.PLAYING:
                 break;
             case GamePhase.READY:
+                Game.canSpawn.val = false;
                 if (keysDown['Space']) {
                     this.startRound();
                 }
-                Game.canSpawn.val = false;
                 break;
             case GamePhase.GAME_OVER:
                 Game.canSpawn.val = false;

@@ -21,7 +21,9 @@ export class Highscores extends Component {
 
     update(delta: number, keysDown: IKeysDown): void {
         if (this.gameState.currentState === GamePhase.READY) {
-            if (keysDown[0] == 'KeyH') {
+            // console.log('sup from highcores update');
+            if (keysDown['KeyH']) {
+                console.log("key registered from highscores update line 26");
                 this._shown = !this._shown;
                 if (this._shown) {
                     fetchHighScore$()
@@ -33,6 +35,8 @@ export class Highscores extends Component {
                         });
                 }
             }
+        }else{
+            this._shown=false;
         }
     }
     render(): void {

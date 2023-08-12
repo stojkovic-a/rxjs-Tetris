@@ -1,4 +1,4 @@
-import { BACKGROUND_ASPECT_RATIO } from "../config";
+import { BACKGROUND_ASPECT_RATIO, BACKGROUND_ASPECT_RATIO_ALT } from "../config";
 import { IGameState } from "../interfaces/IGameState";
 import { IKeysDown } from "../interfaces/IKeysDown";
 import { IRectangle } from "../interfaces/IRectangle";

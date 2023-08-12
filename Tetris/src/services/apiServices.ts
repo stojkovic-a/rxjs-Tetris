@@ -23,12 +23,12 @@ const fetchFromApi$ = <T>(
 
 const fetchPlayerProfile$ = (
     username: string
-): Observable<IUsersScores> => {
-    return fetchFromApi$<IUsersScores>(`users?username=${username}`)
+): Observable<IUsersScores[]> => {
+    return fetchFromApi$<IUsersScores[]>(`users?username=${username}`)
 }
 
 const fetchHighScore$ = (): Observable<IUsersScores[]> => {
-    return fetchFromApi$<IUsersScores[]>(`users?_sort=highscore&_order=desc&_limit=10`)
+    return fetchFromApi$<IUsersScores[]>(`users?_sort=highscore&_order=desc&_limit=5`)
 }
 
 const fetchSprite$ = (): Observable<{

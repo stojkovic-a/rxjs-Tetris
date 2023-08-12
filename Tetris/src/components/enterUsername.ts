@@ -12,7 +12,7 @@ export class EnterUsername extends Component {
     private _username: string;
 
     onCreate(): void {
-
+        this._username = '';
     }
     onResize(newWidth: number, newHeight: number): void {
 
@@ -35,20 +35,20 @@ export class EnterUsername extends Component {
     }
 
     render(): void {
-        if(this.gameState.currentState===GamePhase.ENTER_NAME){
+        if (this.gameState.currentState === GamePhase.ENTER_NAME) {
             drawCenteredText(
                 this.ctx,
                 'Enter username',
                 MEDIUM_TEXT_FONT,
-                this.ctx.canvas.width/2,
-                this.ctx.canvas.height/2-60,
+                this.ctx.canvas.width / 2,
+                this.ctx.canvas.height / 2 - 60,
             );
             drawCenteredText(
                 this.ctx,
                 this._username,
                 MEDIUM_TEXT_FONT,
-                this.ctx.canvas.width/2,
-                this.ctx.canvas.height
+                this.ctx.canvas.width / 2,
+                this.ctx.canvas.height / 2
             );
         }
     }
@@ -64,26 +64,38 @@ export class EnterUsername extends Component {
             this.gameState.player.username = this._username;
             this.gameState.currentState = GamePhase.READY;
             fetchPlayerProfile$(this.gameState.player.username).pipe(
-                tap((playerInfo: IUsersScores) => {
-                    this.gameState.player={...playerInfo,score:0};
+                tap((playerInfo: IUsersScores[]) => {
+                    if (playerInfo.length === 0) {
+                        this.gameState.player={
+                            id:-1,
+                            score:0,
+                            linesCleared:0,
+                            elementsDroped:0,
+                            timePlaying:0,
+                            highscore:0,
+                            username:this._username
+                        }
+                    } else {
+                        this.gameState.player = { ...playerInfo[0], score: 0 };
+                    }
                 }),
-                catchError((error:any)=>{
+                catchError((error: any) => {
                     console.error("Profile not found");
-                    this.gameState.player={
-                        id:-1,
-                        score:0,
-                        linesCleared:0,
-                        elementsDroped:0,
-                        timePlaying:0,
-                        highscore:0,
-                        username:this._username
+                    this.gameState.player = {
+                        id: -1,
+                        score: 0,
+                        linesCleared: 0,
+                        elementsDroped: 0,
+                        timePlaying: 0,
+                        highscore: 0,
+                        username: this._username
                     }
                     return of(this.gameState.player);
                 })
             )
-            .subscribe((player:IPlayerInfo)=>{
-                console.log(player);
-            })
+                .subscribe((player: IPlayerInfo) => {
+                    console.log(player);
+                })
         }
     }
 }

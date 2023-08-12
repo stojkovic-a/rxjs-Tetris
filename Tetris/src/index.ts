@@ -1,9 +1,13 @@
 import { Observable, catchError, concatMap, expand, filter, fromEvent, map, of, switchMap, take, tap, timer, toArray } from "rxjs";
 import { Game } from "./game";
-import { fetchSprite$ } from "./services/apiServices"
+import { fetchPlayerProfile$, fetchSprite$ } from "./services/apiServices"
 import { loadShapeSprites$ } from "./services/imageLoader";
 import { IFrameData } from "./interfaces/IFrameData";
 import { MAXIMUM_DELTA_TIME } from "./config";
+import { IUsersScores } from "./interfaces/IUsersScores";
+import { IPlayerInfo } from "./interfaces/IPlayerInfo";
+import { IGameState } from "./interfaces/IGameState";
+import { startSpawningShapes } from "./services/shapeSpawner";
 
 fromEvent(window, "load").subscribe(() => {
     const canvas = document.createElement("canvas");
@@ -77,7 +81,29 @@ fromEvent(window, "load").subscribe(() => {
 //         x => console.log(x)
 //     )
 
-
-
+    // let test:IGameState={currentState:0,score:0,player:{id:-1,username:"",linesCleared:-1,score:-1,elementsDroped:-1,timePlaying:-1,highscore:-1}}
+    // fetchPlayerProfile$("aca").pipe(
+    //     tap((playerInfo: IUsersScores[]) => {
+            
+    //         console.log("shit",playerInfo.length===0);
+    //         test.player={...playerInfo[0],score:0};
+    //     }),
+    //     catchError((error:any)=>{
+    //         console.error("Profile not found");
+    //             test.player={
+    //             id:-1,
+    //             score:0,
+    //             linesCleared:0,
+    //             elementsDroped:0,
+    //             timePlaying:0,
+    //             highscore:0,
+    //             username:'aca'
+    //         }
+    //         return of(test.player);
+    //     })
+    // )
+    // .subscribe((player:IPlayerInfo)=>{
+    //     console.log(player);
+    // })
 
 

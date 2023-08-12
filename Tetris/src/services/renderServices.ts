@@ -20,7 +20,8 @@ const drawImageRegion=(
     sourceRect:IRectangle
 )=>{
     ctx.drawImage(
-        img,sourceRect.x,
+        img,
+        sourceRect.x,
         sourceRect.y,
         sourceRect.width,
         sourceRect.height,

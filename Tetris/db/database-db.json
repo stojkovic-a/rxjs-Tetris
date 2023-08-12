@@ -4,7 +4,7 @@
             "id":1,
             "username": "aleksandar",
             "highscore": 0,
-            "linesCleared": 0,
+            "linesCleared": 1,
             "elementsDroped": 0,
             "timePlaying": 0
         },
@@ -77,6 +77,6 @@
                 "image":"Zblock.png"
             }
         ],
-        "board":"Board.png"
+        "board":"BoardShort.png"
     }
 }
