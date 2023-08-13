@@ -6,6 +6,8 @@ import { loadShapeSprites$ } from "../services/imageLoader";
 import { Component } from "./component";
 import { Block, Shape } from "./shape";
 import { Game } from "../game";
+import { GlobalImageMap } from "./globalImageMap";
+import { Shapes } from "../enums/Shapes";
 
 export class Board extends Component {
     private _sizeX: number;
@@ -14,7 +16,7 @@ export class Board extends Component {
     private _blocks: Block[][];
     // private sprites: { type: string, img: HTMLImageElement }[] = [];
     private images: Map<string, HTMLImageElement> = new Map();
-    private canSpawn:Game;
+    private canSpawn: Game;
 
 
     constructor(
@@ -26,7 +28,7 @@ export class Board extends Component {
         super(ctx, gameState);
         this._sizeX = x;
         this._sizeY = y;
-        this._board = new Array(y+1).fill([]).map(() => new Array(x).fill(false));
+        this._board = new Array(y + 1).fill([]).map(() => new Array(x).fill(false));
         this._blocks = new Array(y).fill([]).map(() => new Array(x).fill(null));
         for (let i = 0; i < this._sizeY; i++) {
             for (let j = 0; j < this._sizeX; j++) {
@@ -40,21 +42,21 @@ export class Board extends Component {
 
         const sprites: { type: string, img: HTMLImageElement }[] = [];
 
-        loadShapeSprites$().
-            pipe(
+        // loadShapeSprites$().
+        //     pipe(
 
-        )
-            .subscribe(
-                (x) => {
-                    console.log(x);
-                    sprites.push(x);
-                }
-            );
+        // )
+        //     .subscribe(
+        //         (x) => {
+        //             console.log(x);
+        //             sprites.push(x);
+        //         }
+        //     );
 
 
-        sprites.map(sprite => {
-            this.images.set(sprite.type, sprite.img);
-        });
+        // sprites.map(sprite => {
+        //     this.images.set(sprite.type, sprite.img);
+        // });
 
     }
 
@@ -62,14 +64,14 @@ export class Board extends Component {
     }
 
     onResize(newWidth: number, newHeight: number): void {
-        if(this._blocks!==undefined)
-        for (let i = 0; i < this._blocks.length; i++) {
-            for (let j = 0; j < this._blocks[0].length; j++) {
-                if (this._blocks[i][j] !== null) {
-                    this._blocks[i][j].onResize(newWidth,newHeight);
+        if (this._blocks !== undefined)
+            for (let i = 0; i < this._blocks.length; i++) {
+                for (let j = 0; j < this._blocks[0].length; j++) {
+                    if (this._blocks[i][j] !== null) {
+                        this._blocks[i][j].onResize(newWidth, newHeight);
+                    }
                 }
             }
-        }
     }
 
     update(delta: number, keysDown: IKeysDown): void {
@@ -126,7 +128,7 @@ export class Board extends Component {
         return canAdd;
     }
 
-    tryAdd(shape:Shape,posX: number, posY: number, mat: number[][]): IBoolNumber {
+    tryAdd(shape: Shape, posX: number, posY: number, mat: number[][]): IBoolNumber {
         const sizeY = mat.length;
         const sizeX = mat[0].length;
         if (this.canAdd) {
@@ -146,7 +148,7 @@ export class Board extends Component {
 
     removeFullRows(): number {
         let numRemoved = 0;
-        for (let i = 0; i < this._board.length; i++) {
+        for (let i = 0; i < this._sizeY; i++) {
             let rowIsFull = true;
             for (let j = 0; j < this._board[i].length; j++) {
                 if (!this._board[i][j]) {
@@ -162,8 +164,8 @@ export class Board extends Component {
                 this.lowerFlyingRows(i);
             }
         }
-        this.gameState.score+=100*numRemoved;
-        this.gameState.player.score+=100*numRemoved;
+        this.gameState.score += 100 * numRemoved;
+        this.gameState.player.score += 100 * numRemoved;
         return numRemoved;
     }
 
@@ -171,13 +173,13 @@ export class Board extends Component {
         for (let i = removedRow; i > 0; i--) {
             for (let j = 0; j < this._sizeX; j++) {
                 this._board[i][j] = this._board[i - 1][j];
-                this._blocks[i][j]=this._blocks[i-1][j];
+                this._blocks[i][j] = this._blocks[i - 1][j];
             }
         }
 
         for (let i = 0; i < this._sizeX; i++) {
             this._board[0][i] = false;
-            this._blocks[0][i]=null;
+            this._blocks[0][i] = null;
         }
     }
 
@@ -199,10 +201,15 @@ export class Board extends Component {
         for (let i = 0; i < shape.colisionDetectionMatrix.length; i++) {
             for (let j = 0; j < shape.colisionDetectionMatrix[0].length; j++) {
                 if (shape.colisionDetectionMatrix[i][j] === 1) {
+                    // console.log("ggggggggggggggggggggggggg",shape)
+                    // console.log("ppppppppppppppppppp",Shapes[shape.block]);
+                    // console.log('asasdasadasadsads',GlobalImageMap.imageMap.get(shape.block.toString()+'block'));
+                    // console.log(GlobalImageMap.imageMap);
                     this._blocks[i][j] = new Block(
                         this.ctx,
                         this.gameState,
-                        this.images.get(shape.block.toString() + 'block'),
+                        // this.images.get(shape.block.toString() + 'block'),
+                        GlobalImageMap.imageMap.get(Shapes[shape.block] + 'block'),
                         shape.block,
                         0,
                         false,
@@ -211,7 +218,7 @@ export class Board extends Component {
                         shape.posX,
                         shape.posY,
                         shape.block.toString());
-                        this._blocks[i][j].render();
+                    this._blocks[i][j].render();
                 }
             }
         }

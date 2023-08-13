@@ -8,9 +8,12 @@ export const BOARD_BLOCKS_WIDTH=10;
 export const BOARD_BLOCKS_HEIGHt_ALT=20;
 export const BOARD_BLOCKS_HEIGHt=18;
 
+export const BACKGROUND_BLOCKS_HEIGHT=19;
+export const BACKGROUND_BLOCKS_WIDTH=12;
+
 export const BOARD_BORDER_SHIFT_X=1/12;
 export const BOARD_BORDER_SHIFT_Y_ALT=1/22;
-export const BOARD_BORDER_SHIFT_Y=1/19;
+export const BOARD_BORDER_SHIFT_Y=0;
 
 
 
@@ -25,7 +28,7 @@ export const STARTING_DELTA_TIME=0.8;
 
 
 export const MIN_INTERVAL_MS=50;
-export const INITIAL_TIME_MS=800;
+export const INITIAL_TIME_MS=5000;
 export const NUM_SHAPES=7;
 
 

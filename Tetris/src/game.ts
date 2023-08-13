@@ -20,7 +20,7 @@ import { IBoolWrapper } from "./interfaces/IBoolWrapper";
 export class Game {
     private readonly canvas: HTMLCanvasElement;
     private readonly ctx: CanvasRenderingContext2D;
-    private readonly gameState: IGameState;
+    public static gameState: IGameState = INITIAL_GAME_STATE;
 
     private background: Background;
 
@@ -43,13 +43,13 @@ export class Game {
         this.ctx = canvas.getContext('2d');
         this.ctx.imageSmoothingEnabled = false;
 
-        this.gameState = INITIAL_GAME_STATE;
+        Game.gameState = INITIAL_GAME_STATE;
         this.background = null;
         this.shapes = [];
-        this.enterUsername = new EnterUsername(this.ctx, this.gameState);
-        this.highscores = new Highscores(this.ctx, this.gameState);
-        this.overlay = new Overlay(this.ctx, this.gameState);
-        this.board = new Board(this.ctx, this.gameState, BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH);
+        this.enterUsername = new EnterUsername(this.ctx, Game.gameState);
+        this.highscores = new Highscores(this.ctx, Game.gameState);
+        this.overlay = new Overlay(this.ctx, Game.gameState);
+        this.board = new Board(this.ctx, Game.gameState, BOARD_BLOCKS_WIDTH, BOARD_BLOCKS_HEIGHt);
         Game.canSpawn.val = true;
         // this.gameTick$ = decreasingIntervalObservable(MIN_INTERVAL_MS, formula);
         this.mainLoop$ = initializeMainLoop();
@@ -73,9 +73,9 @@ export class Game {
 
 
         loadBackgroundImage$().subscribe((img) => {
-            this.background = new Background(this.ctx, this.gameState, img);
+            this.background = new Background(this.ctx, Game.gameState, img);
             //  this.shapeSpawner$ = startSpawningShapes(this.ctx, this.gameState,Game.canSpawn,this.board,this.background.getRect()[0]);
-            this.shapeSpawner$ = startSpawningShapes(this.ctx, this.gameState, this.board, this.background.getRect()[0]);
+            this.shapeSpawner$ = startSpawningShapes(this.ctx, Game.gameState, this.board, this.background.getRect()[0]);
             // console.log(this.shapeSpawner$);
         })
 
@@ -90,22 +90,24 @@ export class Game {
         if (this.shapeSpawner$) {
             // console.log("lof from game.ts startRound() if shapeSpawner$",this.shapeSpawner$);
             Game.canSpawn.val = true;
-            this.gameState.currentState = GamePhase.PLAYING;
+            Game.gameState.currentState = GamePhase.PLAYING;
             // console.log(Game.canSpawn.val);
             this.shapeSubscription = this.shapeSpawner$.subscribe(
                 (shape) => {
-                     console.log("log from subscribe",shape);
-                    if (shape.onCreate() === false) {
-                        this.die();
+                    if (shape) {
+                        console.log("log from subscribe", shape);
+                        if (shape.onCreate() === false) {
+                            this.die();
+                        }
+                        this.shapes.push(shape);
+                        // console.log(shape);
+                        console.log('SHAPE LENGth', this.shapes.length);
                     }
-                    this.shapes.push(shape);
-                    console.log(shape);
-                    console.log(this.shapes.length);
                 }
             )
 
-            this.gameState.score = 0;
-            this.gameState.player.score = 0;
+            Game.gameState.score = 0;
+            Game.gameState.player.score = 0;
         } else {
             console.log(":(");
         }
@@ -113,7 +115,7 @@ export class Game {
 
 
     updateLogic(deltaTime: number, keysDown: IKeysDown) {
-        switch (this.gameState.currentState) {
+        switch (Game.gameState.currentState) {
             case GamePhase.PLAYING:
                 break;
             case GamePhase.READY:
@@ -178,12 +180,12 @@ export class Game {
     die(): void {
         this.shapes = [];
         this.shapeSubscription.unsubscribe();
-        this.gameState.currentState = GamePhase.GAME_OVER;
+        Game.gameState.currentState = GamePhase.GAME_OVER;
 
-        if (this.gameState.score > this.gameState.player.highscore) {
-            this.gameState.player.highscore = this.gameState.score;
-            putPlayerProfile(this.gameState.player).then((player) => {
-                this.gameState.player = { ...player, score: 0 };
+        if (Game.gameState.score > Game.gameState.player.highscore) {
+            Game.gameState.player.highscore = Game.gameState.score;
+            putPlayerProfile(Game.gameState.player).then((player) => {
+                Game.gameState.player = { ...player, score: 0 };
             });
         }
     }

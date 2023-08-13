@@ -6,7 +6,7 @@ import { IShapeTypes } from "../interfaces/IShapeTypes";
 import { Shapes } from "../enums/Shapes";
 import { Board } from "./board";
 import { IRectangle } from "../interfaces/IRectangle";
-import { BACKGROUND_ASPECT_RATIO, BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH, BOARD_BORDER_SHIFT_X, BOARD_BORDER_SHIFT_Y } from "../config";
+import { BACKGROUND_ASPECT_RATIO, BACKGROUND_BLOCKS_HEIGHT, BACKGROUND_BLOCKS_WIDTH, BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH, BOARD_BORDER_SHIFT_X, BOARD_BORDER_SHIFT_Y } from "../config";
 import { drawImage } from "../services/renderServices";
 import { GamePhase } from "../enums/GamePhase";
 import { Game } from "../game";
@@ -50,11 +50,11 @@ export abstract class Shape extends Component {
         this.board = board;
         this.bgBound = bgBounds
 
-        this.shapeBound={
-        x:bgBounds.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width,
-        y : bgBounds.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height,
-        width : this.colisionDetectionMatrix.length * bgBounds.width / BOARD_BLOCKS_WIDTH,
-        height : this.colisionDetectionMatrix[0].length * bgBounds.height / BOARD_BLOCKS_HEIGHt
+        this.shapeBound = {
+            x: bgBounds.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width,
+            y: bgBounds.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height,
+            width: this.colisionDetectionMatrix.length * bgBounds.width / BOARD_BLOCKS_WIDTH,
+            height: this.colisionDetectionMatrix[0].length * bgBounds.height / BOARD_BLOCKS_HEIGHt
         }
         this.onCreate();
     }
@@ -101,10 +101,9 @@ export class ShapeI extends Shape {
     }
 
     onCreate(): boolean {
-        console.log
         if (this.board) {
-            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
-            console.log(canSpawn,'log from shape.ts checking it shape can be spawned');
+            const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
+            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -120,23 +119,24 @@ export class ShapeI extends Shape {
             height: bgHeight
         }
         if (this.shapeBound) {
-            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+            this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
             this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
     }
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
+            console.log(keysDown);
             if (keysDown['ArrowUp']) {
                 this.rotate();
                 return -1;
             } else
                 if (keysDown["ArrowDown"]) {
-                    if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
+                    if (this.board.tryPosition(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
-                        this.onResize(this.bgBound.width, this.bgBound.height);
+                        this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                         this.render();
                         return -1;
                     } else {
@@ -149,16 +149,16 @@ export class ShapeI extends Shape {
                     }
                 } else
                     if (keysDown["ArrowLeft"]) {
-                        if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
+                        if (this.board.tryPosition(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
-                            this.onResize(this.bgBound.width, this.bgBound.height);
+                            this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                             this.render();
                         }
                     } else
                         if (keysDown["ArrowRight"]) {
-                            if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
+                            if (this.board.tryPosition(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
-                                this.onResize(this.bgBound.width, this.bgBound.height);
+                                this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                                 this.render();
                             }
                         } else
@@ -178,7 +178,29 @@ export class ShapeI extends Shape {
 
     render(): void {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
-            drawImage(this.ctx, this.image, this.shapeBound);
+            if (this.shapeBound) {
+                this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+                this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+                this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
+            }
+            let drawingRect: IRectangle = null;
+            if (this.rotation === 0) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height,
+                    width: this.shapeBound.width / 4
+                }
+            } else if (this.rotation === 1) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height / 4,
+                    width: this.shapeBound.width
+                }
+            }
+            drawImage(this.ctx, this.image, drawingRect);
         }
     }
 
@@ -251,7 +273,8 @@ export class ShapeT extends Shape {
 
     onCreate(): boolean {
         if (this.board) {
-            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
+            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -267,23 +290,24 @@ export class ShapeT extends Shape {
         }
 
         if (this.shapeBound) {
-            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+            this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
             this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
     }
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
+            console.log(keysDown);
             if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
             } else
                 if (keysDown["ArrowDown"]) {
-                    if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
+                    if (this.board.tryPosition(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
-                        this.onResize(this.bgBound.width, this.bgBound.height);
+                        this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                         this.render();
                         return -1;
                     } else {
@@ -296,16 +320,16 @@ export class ShapeT extends Shape {
                     }
                 } else
                     if (keysDown["ArrowLeft"]) {
-                        if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
+                        if (this.board.tryPosition(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
-                            this.onResize(this.bgBound.width, this.bgBound.height);
+                            this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                             this.render();
                         }
                     } else
                         if (keysDown["ArrowRight"]) {
-                            if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
+                            if (this.board.tryPosition(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
-                                this.onResize(this.bgBound.width, this.bgBound.height);
+                                this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                                 this.render();
                             }
                         } else
@@ -325,7 +349,44 @@ export class ShapeT extends Shape {
 
     render(): void {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
-            drawImage(this.ctx, this.image, this.shapeBound);
+            if (this.shapeBound) {
+                this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+                this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+                this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
+            }
+            let drawingRect: IRectangle = null;
+            if (this.rotation === 0) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height * 2 / 3,
+                    width: this.shapeBound.width
+                }
+            } else if (this.rotation === 1) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height,
+                    width: this.shapeBound.width * 2 / 3
+                }
+            } else if (this.rotation === 2) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height * 2 / 3,
+                    width: this.shapeBound.width
+                }
+            }
+            else if (this.rotation === 3) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height,
+                    width: this.shapeBound.width * 2 / 3
+                }
+            }
+            drawImage(this.ctx, this.image, drawingRect);
         }
     }
     rotate(): void {
@@ -435,7 +496,8 @@ export class ShapeO extends Shape {
 
     onCreate(): boolean {
         if (this.board) {
-            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
+            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -451,23 +513,24 @@ export class ShapeO extends Shape {
             height: bgHeight
         }
         if (this.shapeBound) {
-            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+            this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
             this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
     }
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
+            console.log(keysDown);
             if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
             } else
                 if (keysDown["ArrowDown"]) {
-                    if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
+                    if (this.board.tryPosition(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
-                        this.onResize(this.bgBound.width, this.bgBound.height);
+                        this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                         this.render();
                         return -1;
                     } else {
@@ -480,16 +543,16 @@ export class ShapeO extends Shape {
                     }
                 } else
                     if (keysDown["ArrowLeft"]) {
-                        if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
+                        if (this.board.tryPosition(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
-                            this.onResize(this.bgBound.width, this.bgBound.height);
+                            this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                             this.render();
                         }
                     } else
                         if (keysDown["ArrowRight"]) {
-                            if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
+                            if (this.board.tryPosition(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
-                                this.onResize(this.bgBound.width, this.bgBound.height);
+                                this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                                 this.render();
                             }
                         } else
@@ -509,6 +572,12 @@ export class ShapeO extends Shape {
 
     render(): void {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
+            if (this.shapeBound) {
+                this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+                this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+                this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
+            }
             drawImage(this.ctx, this.image, this.shapeBound);
         }
     }
@@ -553,7 +622,8 @@ export class ShapeS extends Shape {
 
     onCreate(): boolean {
         if (this.board) {
-            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
+            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -569,23 +639,24 @@ export class ShapeS extends Shape {
             height: bgHeight
         }
         if (this.shapeBound) {
-            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+            this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
             this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
     }
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
+            console.log(keysDown);
             if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
             } else
                 if (keysDown["ArrowDown"]) {
-                    if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
+                    if (this.board.tryPosition(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
-                        this.onResize(this.bgBound.width, this.bgBound.height);
+                        this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                         this.render();
                         return -1;
                     } else {
@@ -598,16 +669,16 @@ export class ShapeS extends Shape {
                     }
                 } else
                     if (keysDown["ArrowLeft"]) {
-                        if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
+                        if (this.board.tryPosition(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
-                            this.onResize(this.bgBound.width, this.bgBound.height);
+                            this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                             this.render();
                         }
                     } else
                         if (keysDown["ArrowRight"]) {
-                            if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
+                            if (this.board.tryPosition(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
-                                this.onResize(this.bgBound.width, this.bgBound.height);
+                                this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                                 this.render();
                             }
                         } else
@@ -627,7 +698,29 @@ export class ShapeS extends Shape {
 
     render(): void {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
-            drawImage(this.ctx, this.image, this.shapeBound);
+            if (this.shapeBound) {
+                this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+                this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+                this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
+            }
+            let drawingRect: IRectangle = null;
+            if (this.rotation === 0) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height * 2 / 3,
+                    width: this.shapeBound.width
+                }
+            } else if (this.rotation === 1) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height,
+                    width: this.shapeBound.width * 2 / 3
+                }
+            }
+            drawImage(this.ctx, this.image, drawingRect);
         }
     }
     rotate(): void {
@@ -693,7 +786,7 @@ export class ShapeZ extends Shape {
             image,
             block,
             tickTime,
-            [[1, 1, 0], [0, 1, 1]],
+            [[1, 1, 0], [0, 1, 1], [0, 0, 0]],
             moving,
             board,
             bgBounds,
@@ -705,7 +798,8 @@ export class ShapeZ extends Shape {
 
     onCreate(): boolean {
         if (this.board) {
-            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
+            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -720,25 +814,26 @@ export class ShapeZ extends Shape {
             width: bgdWidth,
             height: bgHeight
         }
-        if (this.shapeBound) {    
-            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+        if (this.shapeBound) {
+            this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
             this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
 
     }
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
+            console.log(keysDown);
             if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
             } else
                 if (keysDown["ArrowDown"]) {
-                    if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
+                    if (this.board.tryPosition(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
-                        this.onResize(this.bgBound.width, this.bgBound.height);
+                        this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                         this.render();
                         return -1;
                     } else {
@@ -751,16 +846,16 @@ export class ShapeZ extends Shape {
                     }
                 } else
                     if (keysDown["ArrowLeft"]) {
-                        if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
+                        if (this.board.tryPosition(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
-                            this.onResize(this.bgBound.width, this.bgBound.height);
+                            this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                             this.render();
                         }
                     } else
                         if (keysDown["ArrowRight"]) {
-                            if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
+                            if (this.board.tryPosition(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
-                                this.onResize(this.bgBound.width, this.bgBound.height);
+                                this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                                 this.render();
                             }
                         } else
@@ -780,7 +875,29 @@ export class ShapeZ extends Shape {
 
     render(): void {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
-            drawImage(this.ctx, this.image, this.shapeBound);
+            if (this.shapeBound) {
+                this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+                this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+                this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
+            }
+            let drawingRect: IRectangle = null;
+            if (this.rotation === 0) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height * 2 / 3,
+                    width: this.shapeBound.width
+                }
+            } else if (this.rotation === 1) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height,
+                    width: this.shapeBound.width * 2 / 3
+                }
+            }
+            drawImage(this.ctx, this.image, drawingRect);
         }
     }
     rotate(): void {
@@ -856,7 +973,8 @@ export class ShapeL extends Shape {
 
     onCreate(): boolean {
         if (this.board) {
-            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
+            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -871,25 +989,26 @@ export class ShapeL extends Shape {
             width: bgdWidth,
             height: bgHeight
         }
-        if (this.shapeBound) {    
-            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+        if (this.shapeBound) {
+            this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
             this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
 
     }
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
+            console.log(keysDown);
             if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
             } else
                 if (keysDown["ArrowDown"]) {
-                    if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
+                    if (this.board.tryPosition(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
-                        this.onResize(this.bgBound.width, this.bgBound.height);
+                        this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                         this.render();
                         return -1;
                     } else {
@@ -902,16 +1021,16 @@ export class ShapeL extends Shape {
                     }
                 } else
                     if (keysDown["ArrowLeft"]) {
-                        if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
+                        if (this.board.tryPosition(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
-                            this.onResize(this.bgBound.width, this.bgBound.height);
+                            this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                             this.render();
                         }
                     } else
                         if (keysDown["ArrowRight"]) {
-                            if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
+                            if (this.board.tryPosition(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
-                                this.onResize(this.bgBound.width, this.bgBound.height);
+                                this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                                 this.render();
                             }
                         } else
@@ -931,7 +1050,44 @@ export class ShapeL extends Shape {
 
     render(): void {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
-            drawImage(this.ctx, this.image, this.shapeBound);
+            if (this.shapeBound) {
+                this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+                this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+                this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
+            }
+            let drawingRect: IRectangle = null;
+            if (this.rotation === 0) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height * 2 / 3,
+                    width: this.shapeBound.width
+                }
+            } else if (this.rotation === 1) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height,
+                    width: this.shapeBound.width * 2 / 3
+                }
+            } else if (this.rotation === 2) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height * 2 / 3,
+                    width: this.shapeBound.width
+                }
+            }
+            else if (this.rotation === 3) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height,
+                    width: this.shapeBound.width * 2 / 3
+                }
+            }
+            drawImage(this.ctx, this.image, drawingRect);
         }
     }
     rotate(): void {
@@ -1041,7 +1197,8 @@ export class ShapeJ extends Shape {
 
     onCreate(): boolean {
         if (this.board) {
-            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
+            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -1056,25 +1213,26 @@ export class ShapeJ extends Shape {
             width: bgdWidth,
             height: bgHeight
         }
-        if (this.shapeBound) {    
-            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+        if (this.shapeBound) {
+            this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
             this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
 
     }
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
+            console.log(keysDown);
             if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
             } else
                 if (keysDown["ArrowDown"]) {
-                    if (this.board.canAdd(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
+                    if (this.board.tryPosition(this.posX, this.posY + 1, this.colisionDetectionMatrix)) {
                         this.posY++;
-                        this.onResize(this.bgBound.width, this.bgBound.height);
+                        this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                         this.render();
                         return -1;
                     } else {
@@ -1087,16 +1245,16 @@ export class ShapeJ extends Shape {
                     }
                 } else
                     if (keysDown["ArrowLeft"]) {
-                        if (this.board.canAdd(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
+                        if (this.board.tryPosition(this.posX - 1, this.posY, this.colisionDetectionMatrix)) {
                             this.posX--;
-                            this.onResize(this.bgBound.width, this.bgBound.height);
+                            this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                             this.render();
                         }
                     } else
                         if (keysDown["ArrowRight"]) {
-                            if (this.board.canAdd(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
+                            if (this.board.tryPosition(this.posX + 1, this.posY, this.colisionDetectionMatrix)) {
                                 this.posX++;
-                                this.onResize(this.bgBound.width, this.bgBound.height);
+                                this.onResize(this.ctx.canvas.width, this.ctx.canvas.height);
                                 this.render();
                             }
                         } else
@@ -1116,7 +1274,44 @@ export class ShapeJ extends Shape {
 
     render(): void {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
-            drawImage(this.ctx, this.image, this.shapeBound);
+            if (this.shapeBound) {
+                this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+                this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+                this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
+            }
+            let drawingRect: IRectangle = null;
+            if (this.rotation === 0) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height * 2 / 3,
+                    width: this.shapeBound.width
+                }
+            } else if (this.rotation === 1) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height,
+                    width: this.shapeBound.width * 2 / 3
+                }
+            } else if (this.rotation === 2) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height * 2 / 3,
+                    width: this.shapeBound.width
+                }
+            }
+            else if (this.rotation === 3) {
+                drawingRect = {
+                    x: this.shapeBound.x,
+                    y: this.shapeBound.y,
+                    height: this.shapeBound.height,
+                    width: this.shapeBound.width * 2 / 3
+                }
+            }
+            drawImage(this.ctx, this.image, drawingRect);
         }
     }
     rotate(): void {
@@ -1228,7 +1423,8 @@ export class Block extends Shape {
 
     onCreate(): boolean {
         if (this.board) {
-            const canSpawn = this.board.canAdd(this.posX, this.posY, this.colisionDetectionMatrix);
+            const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
+            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -1243,18 +1439,24 @@ export class Block extends Shape {
             width: bgdWidth,
             height: bgHeight
         }
-        if (this.shapeBound) {    
-            this.shapeBound.x = this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+        if (this.shapeBound) {
+            this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
             this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
-            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BOARD_BLOCKS_WIDTH;
-            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BOARD_BLOCKS_HEIGHt;
+            this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+            this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
 
     }
 
     render(): void {
         if (this.bgBound.x <= this.ctx.canvas.width) {
-            drawImage(this.ctx, this.image, this.shapeBound);
+            if (this.shapeBound) {
+                this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BORDER_SHIFT_X + this.posX * BOARD_BORDER_SHIFT_X * this.bgBound.width
+                this.shapeBound.y = this.bgBound.height * BOARD_BORDER_SHIFT_Y + this.posY * BOARD_BORDER_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
+                this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
+                drawImage(this.ctx, this.image, this.shapeBound);
+            }
         }
     }
 

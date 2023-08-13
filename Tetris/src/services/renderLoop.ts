@@ -3,6 +3,7 @@ import { IFrameData } from "../interfaces/IFrameData"
 import { MAXIMUM_DELTA_TIME, MIN_INTERVAL_MS } from "../config";
 import { IKeysDown } from "../interfaces/IKeysDown";
 import { decreasingIntervalObservable, formula } from "./gameTicker";
+import { IGameState } from "../interfaces/IGameState";
 
 
 

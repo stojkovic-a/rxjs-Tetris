@@ -8,6 +8,7 @@ import { IRectangle } from "../interfaces/IRectangle";
 import { MIN_INTERVAL_MS } from "../config";
 import { IBoolWrapper } from "../interfaces/IBoolWrapper";
 import { Game } from "../game";
+import { GlobalImageMap } from "../components/globalImageMap";
 
 // export const shapeSpawner=():Observable<number>=>{
 //     return defer(()=>of(Math.floor(Math.random()*7)))
@@ -124,8 +125,8 @@ function returnShapeFromNumber(
         switchMap(sprites => {
             let images: Map<string, HTMLImageElement> = new Map();
 
-            images.set(sprites.type, sprites.img); // Set the image based on sprites.type
-            console.log("current images state", images);
+            images.set(sprites.type, sprites.img);
+            GlobalImageMap.imageMap.set(sprites.type,sprites.img);
 
             let shapeToReturn: Shape;
 
@@ -135,22 +136,16 @@ function returnShapeFromNumber(
                 shapeToReturn = new ShapeT(ctx, gameState, images.get("T"), Shapes.T, 0, true, board, bgRect, 4, 0);
             } else if (num === 2 && sprites.type === "O") {
                 shapeToReturn = new ShapeO(ctx, gameState, images.get("O"), Shapes.O, 0, true, board, bgRect, 4, 0);
-                console.log(shapeToReturn)
             } else if (num === 3 && sprites.type === "S") {
                 shapeToReturn = new ShapeS(ctx, gameState, images.get("S"), Shapes.S, 0, true, board, bgRect, 4, 0);
-                console.log(shapeToReturn)
             } else if (num === 4 && sprites.type === "Z") {
                 shapeToReturn = new ShapeZ(ctx, gameState, images.get("Z"), Shapes.Z, 0, true, board, bgRect, 4, 0);
-                console.log(shapeToReturn)
             } else if (num === 5 && sprites.type === "L") {
                 shapeToReturn = new ShapeL(ctx, gameState, images.get("L"), Shapes.L, 0, true, board, bgRect, 4, 0);
-                console.log(shapeToReturn)
             } else if (num === 6 && sprites.type === "J") {
                 shapeToReturn = new ShapeJ(ctx, gameState, images.get("J"), Shapes.J, 0, true, board, bgRect, 4, 0);
-                console.log(shapeToReturn)
             } else {
                 shapeToReturn = null;
-                console.log(shapeToReturn)
             }
 
 
