@@ -23,6 +23,17 @@ fromEvent(window, "load").subscribe(() => {
 });
 
 
+// let img:HTMLImageElement=new Image();
+// img.src='./src/assets/I.png';
+// const canvas=document.createElement("canvas");
+// canvas.id="game-container";
+// canvas.width=window.innerWidth;
+// canvas.height=window.innerHeight;
+// document.body.appendChild(canvas);
+
+// let ctx=canvas.getContext('2d');
+// ctx.drawImage(img,canvas.width,canvas.height);
+
 // console.log("aaa")
 // shapeSpawner().pipe(
 //     switchMap(num => loadShapeSprites$().pipe(

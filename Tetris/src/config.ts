@@ -15,7 +15,8 @@ export const BOARD_BORDER_SHIFT_X=1/12;
 export const BOARD_BORDER_SHIFT_Y_ALT=1/22;
 export const BOARD_BORDER_SHIFT_Y=0;
 
-
+export const BOARD_BLOCK_SHIFT_X=1/12;
+export const BOARD_BLOCK_SHIFT_Y=1/19;
 
 export const SMALL_TEXT_FONT = '1rem "Press Start 2P"';
 export const MEDIUM_TEXT_FONT = '2rem "Press Start 2P"';

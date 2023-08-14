@@ -16,6 +16,7 @@ import { putPlayerProfile } from "./services/apiServices";
 import { Board } from "./components/board";
 import { startSpawningShapes } from "./services/shapeSpawner";
 import { IBoolWrapper } from "./interfaces/IBoolWrapper";
+import { TickerReset } from "./components/TikerReset";
 // import { getKeysDown } from "./services/keybordInputService";
 export class Game {
     private readonly canvas: HTMLCanvasElement;
@@ -53,6 +54,7 @@ export class Game {
         Game.canSpawn.val = true;
         // this.gameTick$ = decreasingIntervalObservable(MIN_INTERVAL_MS, formula);
         this.mainLoop$ = initializeMainLoop();
+        TickerReset.stop();
 
     }
 
@@ -91,6 +93,8 @@ export class Game {
             // console.log("lof from game.ts startRound() if shapeSpawner$",this.shapeSpawner$);
             Game.canSpawn.val = true;
             Game.gameState.currentState = GamePhase.PLAYING;
+            TickerReset.stop();
+            TickerReset.start();
             // console.log(Game.canSpawn.val);
             this.shapeSubscription = this.shapeSpawner$.subscribe(
                 (shape) => {
@@ -178,6 +182,7 @@ export class Game {
     }
 
     die(): void {
+        TickerReset.stop();
         this.shapes = [];
         this.shapeSubscription.unsubscribe();
         Game.gameState.currentState = GamePhase.GAME_OVER;
