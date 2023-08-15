@@ -1,5 +1,6 @@
 import { LARGE_TEXT_FONT, MEDIUM_TEXT_FONT, SMALL_TEXT_FONT } from "../config";
 import { GamePhase } from "../enums/GamePhase";
+import { Game } from "../game";
 import { IKeysDown } from "../interfaces/IKeysDown";
 import { drawCenteredText, drawText } from "../services/renderServices";
 import { Component } from "./component";
@@ -52,7 +53,7 @@ export class Overlay extends Component {
     }
 
     renderCurrentScore(): void {
-        const scoreText = this.gameState.score.toString();
+        const scoreText = Game.gameState.player.score.toString();
         drawText(
             this.ctx,
             scoreText,

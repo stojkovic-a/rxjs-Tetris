@@ -1,130 +1,140 @@
 {
-    "users": [
-        {
-            "id":1,
-            "username": "aleksandar",
-            "highscore": 0,
-            "linesCleared": 1,
-            "elementsDroped": 0,
-            "timePlaying": 0
-        },
-        {
-            "id":2,
-            "username": "milan",
-            "highscore": 0,
-            "linesCleared": 0,
-            "elementsDroped": 0,
-            "timePlaying": 0
-        }
-    ],
-    "sprites": {
-        "path": "./src/assets/",
-        "shapes":[
-            {
-                "type":"I0",
-                "image":"I0.png"
-            },
-            {
-                "type":"I1",
-                "image":"I1.png"
-            },
-            {
-                "type":"J0",
-                "image":"J0.png"
-            },
-            {
-                "type":"J1",
-                "image":"J1.png"
-            },
-            {
-                "type":"J2",
-                "image":"J2.png"
-            },
-            {
-                "type":"J3",
-                "image":"J3.png"
-            },
-            {
-                "type":"L0",
-                "image":"L0.png"
-            },
-            {
-                "type":"L1",
-                "image":"L1.png"
-            },
-            {
-                "type":"L2",
-                "image":"L2.png"
-            },
-            {
-                "type":"L3",
-                "image":"L3.png"
-            },
-            {
-                "type":"O0",
-                "image":"O0.png"
-            },
-            {
-                "type":"S0",
-                "image":"S0.png"
-            },
-            {
-                "type":"S1",
-                "image":"S1.png"
-            },
-            {
-                "type":"T0",
-                "image":"T0.png"
-            },
-            {
-                "type":"T1",
-                "image":"T1.png"
-            },
-            {
-                "type":"T2",
-                "image":"T2.png"
-            },
-            {
-                "type":"T3",
-                "image":"T3.png"
-            },
-            {
-                "type":"Z0",
-                "image":"Z0.png"
-            },
-            {
-                "type":"Z1",
-                "image":"Z1.png"
-            },
-            {
-                "type":"Iblock",
-                "image":"Iblock.png"
-            },
-            {
-                "type":"Jblock",
-                "image":"Jblock.png"
-            },
-            {
-                "type":"Lblock",
-                "image":"Lblock.png"
-            },
-            {
-                "type":"Oblock",
-                "image":"Oblock.png"
-            },
-            {
-                "type":"Sblock",
-                "image":"Sblock.png"
-            },
-            {
-                "type":"Tblock",
-                "image":"Tblock.png"
-            },
-            {
-                "type":"Zblock",
-                "image":"Zblock.png"
-            }
-        ],
-        "board":"BoardShort.png"
+  "users": [
+    {
+      "id": 1,
+      "username": "aleksandar",
+      "highscore": 1100,
+      "linesCleared": 1,
+      "elementsDroped": 0,
+      "timePlaying": 0,
+      "score": 1100
+    },
+    {
+      "id": 2,
+      "username": "milan",
+      "highscore": 0,
+      "linesCleared": 0,
+      "elementsDroped": 0,
+      "timePlaying": 0
+    },
+    {
+      "id": -1,
+      "score": 1300,
+      "linesCleared": 0,
+      "elementsDroped": 0,
+      "timePlaying": 0,
+      "highscore": 1300,
+      "username": "aca"
     }
+  ],
+  "sprites": {
+    "path": "./src/assets/",
+    "shapes": [
+      {
+        "type": "I0",
+        "image": "I0.png"
+      },
+      {
+        "type": "I1",
+        "image": "I1.png"
+      },
+      {
+        "type": "J0",
+        "image": "J0.png"
+      },
+      {
+        "type": "J1",
+        "image": "J1.png"
+      },
+      {
+        "type": "J2",
+        "image": "J2.png"
+      },
+      {
+        "type": "J3",
+        "image": "J3.png"
+      },
+      {
+        "type": "L0",
+        "image": "L0.png"
+      },
+      {
+        "type": "L1",
+        "image": "L1.png"
+      },
+      {
+        "type": "L2",
+        "image": "L2.png"
+      },
+      {
+        "type": "L3",
+        "image": "L3.png"
+      },
+      {
+        "type": "O0",
+        "image": "O0.png"
+      },
+      {
+        "type": "S0",
+        "image": "S0.png"
+      },
+      {
+        "type": "S1",
+        "image": "S1.png"
+      },
+      {
+        "type": "T0",
+        "image": "T0.png"
+      },
+      {
+        "type": "T1",
+        "image": "T1.png"
+      },
+      {
+        "type": "T2",
+        "image": "T2.png"
+      },
+      {
+        "type": "T3",
+        "image": "T3.png"
+      },
+      {
+        "type": "Z0",
+        "image": "Z0.png"
+      },
+      {
+        "type": "Z1",
+        "image": "Z1.png"
+      },
+      {
+        "type": "Iblock",
+        "image": "Iblock.png"
+      },
+      {
+        "type": "Jblock",
+        "image": "Jblock.png"
+      },
+      {
+        "type": "Lblock",
+        "image": "Lblock.png"
+      },
+      {
+        "type": "Oblock",
+        "image": "Oblock.png"
+      },
+      {
+        "type": "Sblock",
+        "image": "Sblock.png"
+      },
+      {
+        "type": "Tblock",
+        "image": "Tblock.png"
+      },
+      {
+        "type": "Zblock",
+        "image": "Zblock.png"
+      }
+    ],
+    "board": "BoardShort.png"
+  }
 }

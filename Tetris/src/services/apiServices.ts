@@ -58,9 +58,12 @@ const putPlayerProfile = (player: IUsersScores): Promise<IUsersScores> => {
     let method: string;
     let route: string;
 
-    if (player.id !== 0) {
+    if (player.id> 0) {
         method = 'PUT';
-        route = '/users'
+        route = `/users/${player.id}`
+    }else{
+        method='POST';
+        route="/users"
     }
 
     return apiCall<IUsersScores>(route,{
