@@ -125,12 +125,14 @@ export class Game {
             case GamePhase.READY:
                 Game.canSpawn.val = false;
                 if (keysDown['Space']) {
+                    this.cleanShapesAndBoard();
                     this.startRound();
                 }
                 break;
             case GamePhase.GAME_OVER:
                 Game.canSpawn.val = false;
                 if (keysDown['Space']) {
+                    this.cleanShapesAndBoard();
                     this.startRound();
                 }
                 break;
@@ -190,10 +192,14 @@ export class Game {
         if (Game.gameState.score > Game.gameState.player.highscore) {
             Game.gameState.player.highscore = Game.gameState.score;
             putPlayerProfile(Game.gameState.player).then((player) => {
-                Game.gameState.player = { ...player, score: 0 };
+                Game.gameState.player = { ...player, score:Game.gameState.score };
             });
         }
+        this.cleanShapesAndBoard();
     }
-
+    cleanShapesAndBoard():void{
+        this.shapes=[];
+        this.board.clear();
+    }
     //detect death and call die;
 }

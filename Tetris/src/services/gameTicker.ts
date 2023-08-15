@@ -43,6 +43,6 @@ export function decreasingIntervalObservable(
 // const resetDecreasingObservableSubscription
 
 export const formula = (initialTime: number, iteration: number): number => {
-    console.log(initialTime / (1 + (iteration - iteration % 5) / 5))
+    // console.log(initialTime / (1 + (iteration - iteration % 5) / 5))
     return initialTime / (1 + (iteration - iteration % 5) / 5)
 }

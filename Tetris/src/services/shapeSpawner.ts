@@ -1,4 +1,4 @@
-import { Observable, defer, filter, interval, map, of, switchMap, tap, toArray } from "rxjs";
+import { Observable, defer, filter, interval, map, of, switchMap, take, tap, toArray } from "rxjs";
 import { IGameState } from "../interfaces/IGameState";
 import { Shape, ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT, ShapeZ } from "../components/shape";
 import { loadBackgroundImage$, loadShapeSprites$ } from "./imageLoader";
@@ -126,28 +126,27 @@ function returnShapeFromNumber(
             let images: Map<string, HTMLImageElement> = new Map();
 
             images.set(sprites.type, sprites.img);
-            GlobalImageMap.imageMap.set(sprites.type,sprites.img);
+            GlobalImageMap.imageMap.set(sprites.type, sprites.img);
 
             let shapeToReturn: Shape;
 
-            if (num === 0 && sprites.type === "I") {
-                shapeToReturn = new ShapeI(ctx, gameState, images.get('I'), Shapes.I, 0, true, board, bgRect, 4, 0);
-            } else if (num === 1 && sprites.type === "T") {
-                shapeToReturn = new ShapeT(ctx, gameState, images.get("T"), Shapes.T, 0, true, board, bgRect, 4, 0);
-            } else if (num === 2 && sprites.type === "O") {
-                shapeToReturn = new ShapeO(ctx, gameState, images.get("O"), Shapes.O, 0, true, board, bgRect, 4, 0);
-            } else if (num === 3 && sprites.type === "S") {
-                shapeToReturn = new ShapeS(ctx, gameState, images.get("S"), Shapes.S, 0, true, board, bgRect, 4, 0);
-            } else if (num === 4 && sprites.type === "Z") {
-                shapeToReturn = new ShapeZ(ctx, gameState, images.get("Z"), Shapes.Z, 0, true, board, bgRect, 4, 0);
-            } else if (num === 5 && sprites.type === "L") {
-                shapeToReturn = new ShapeL(ctx, gameState, images.get("L"), Shapes.L, 0, true, board, bgRect, 4, 0);
-            } else if (num === 6 && sprites.type === "J") {
-                shapeToReturn = new ShapeJ(ctx, gameState, images.get("J"), Shapes.J, 0, true, board, bgRect, 4, 0);
+            if (num === 0 && sprites.type === "I0") {
+                shapeToReturn = new ShapeI(ctx, gameState, images.get('I0'), Shapes.I, 0, true, board, bgRect, 4, 0);
+            } else if (num === 1 && sprites.type === "T0") {
+                shapeToReturn = new ShapeT(ctx, gameState, images.get("T0"), Shapes.T, 0, true, board, bgRect, 4, 0);
+            } else if (num === 2 && sprites.type === "O0") {
+                shapeToReturn = new ShapeO(ctx, gameState, images.get("O0"), Shapes.O, 0, true, board, bgRect, 4, 0);
+            } else if (num === 3 && sprites.type === "S0") {
+                shapeToReturn = new ShapeS(ctx, gameState, images.get("S0"), Shapes.S, 0, true, board, bgRect, 4, 0);
+            } else if (num === 4 && sprites.type === "Z0") {
+                shapeToReturn = new ShapeZ(ctx, gameState, images.get("Z0"), Shapes.Z, 0, true, board, bgRect, 4, 0);
+            } else if (num === 5 && sprites.type === "L0") {
+                shapeToReturn = new ShapeL(ctx, gameState, images.get("L0"), Shapes.L, 0, true, board, bgRect, 4, 0);
+            } else if (num === 6 && sprites.type === "J0") {
+                shapeToReturn = new ShapeJ(ctx, gameState, images.get("J0"), Shapes.J, 0, true, board, bgRect, 4, 0);
             } else {
                 shapeToReturn = null;
             }
-
 
             return of(shapeToReturn);
         })
@@ -163,6 +162,6 @@ export function startSpawningShapes(
     return interval(MIN_INTERVAL_MS).pipe(
         filter(() => Game.canSpawn.val),
         tap(() => Game.canSpawn.val = false),
-        switchMap(() => returnShapeFromNumber(getRandomShapeNumber(), ctx, gameState, board, bgRect))
+        switchMap(() => returnShapeFromNumber(getRandomShapeNumber(), ctx, gameState, board, bgRect)),
     );
 }

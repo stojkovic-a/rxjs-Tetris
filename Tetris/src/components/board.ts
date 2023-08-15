@@ -150,7 +150,7 @@ export class Board extends Component {
         let numRemoved = 0;
         for (let i = 0; i < this._sizeY; i++) {
             let rowIsFull = true;
-            for (let j = 0; j < this._board[i].length; j++) {
+            for (let j = 0; j < this._sizeX; j++) {
                 if (!this._board[i][j]) {
                     rowIsFull = false;
                     break;
@@ -158,8 +158,9 @@ export class Board extends Component {
             }
             if (rowIsFull) {
                 numRemoved++;
-                for (let j = 0; j < this._board[i].length; j++) {
+                for (let j = 0; j < this._sizeX; j++) {
                     this._board[i][j] = false;
+                    this._blocks[i][j] = null;
                 }
                 this.lowerFlyingRows(i);
             }
@@ -173,7 +174,23 @@ export class Board extends Component {
         for (let i = removedRow; i > 0; i--) {
             for (let j = 0; j < this._sizeX; j++) {
                 this._board[i][j] = this._board[i - 1][j];
-                this._blocks[i][j] = this._blocks[i - 1][j];
+                if (this._blocks[i - 1][j] === null) {
+                    this._blocks[i][j] = null;
+                } else {
+                    this._blocks[i][j] = new Block(
+                        this.ctx,
+                        this.gameState,
+                        this._blocks[i - 1][j].getImage(),
+                        this._blocks[i - 1][j].getBlock(),
+                        0,
+                        false,
+                        this,
+                        this._blocks[i - 1][j].getBgBounds(),
+                        this._blocks[i - 1][j].posX,
+                        this._blocks[i - 1][j].posY + 1,
+                        this._blocks[i - 1][j].getType()
+                    )
+                }
             }
         }
 
@@ -205,7 +222,7 @@ export class Board extends Component {
                     // console.log("ppppppppppppppppppp",Shapes[shape.block]);
                     // console.log('asasdasadasadsads',GlobalImageMap.imageMap.get(shape.block.toString()+'block'));
                     // console.log(GlobalImageMap.imageMap);
-                    this._blocks[i][j] = new Block(
+                    this._blocks[i + shape.posY][j + shape.posX] = new Block(
                         this.ctx,
                         this.gameState,
                         // this.images.get(shape.block.toString() + 'block'),
@@ -215,13 +232,27 @@ export class Board extends Component {
                         false,
                         this,
                         shape.bgBound,
-                        shape.posX,
-                        shape.posY,
+                        shape.posX + j,
+                        shape.posY + i,
                         shape.block.toString());
-                    this._blocks[i][j].render();
+                    this._blocks[i + shape.posY][j + shape.posX].render();
+                    console.log(this._blocks[i + shape.posY][j + shape.posX].type);
                 }
             }
         }
 
+    }
+    clear(): void {
+        this._board = new Array(this._sizeY + 1).fill([]).map(() => new Array(this._sizeX).fill(false));
+        this._blocks = new Array(this._sizeY).fill([]).map(() => new Array(this._sizeX).fill(null));
+        for (let i = 0; i < this._sizeY; i++) {
+            for (let j = 0; j < this._sizeX; j++) {
+                this._board[i][j] = false;
+                this._blocks[i][j] = null;
+            }
+        }
+        for (let i = 0; i < this._sizeX; i++) {
+            this._board[this._sizeY][i] = true;
+        }
     }
 }

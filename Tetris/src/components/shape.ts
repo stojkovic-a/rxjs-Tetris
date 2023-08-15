@@ -10,10 +10,11 @@ import { BACKGROUND_ASPECT_RATIO, BACKGROUND_BLOCKS_HEIGHT, BACKGROUND_BLOCKS_WI
 import { drawImage } from "../services/renderServices";
 import { GamePhase } from "../enums/GamePhase";
 import { Game } from "../game";
+import { GlobalImageMap } from "./globalImageMap";
 export abstract class Shape extends Component {
 
     public readonly block: Shapes;
-    protected readonly image: HTMLImageElement;
+    protected image: HTMLImageElement;
     public posX: number;
     public posY: number;
     protected readonly board: Board;
@@ -90,7 +91,7 @@ export class ShapeI extends Shape {
             image,
             block,
             tickTime,
-            [[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]],
+            [[1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
             moving,
             board,
             bgBounds,
@@ -120,7 +121,7 @@ export class ShapeI extends Shape {
         }
         if (this.shapeBound) {
             this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-            this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
             this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
             this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
@@ -180,7 +181,7 @@ export class ShapeI extends Shape {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
             if (this.shapeBound) {
                 this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-                this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
                 this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
                 this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
             }
@@ -189,15 +190,15 @@ export class ShapeI extends Shape {
                 drawingRect = {
                     x: this.shapeBound.x,
                     y: this.shapeBound.y,
-                    height: this.shapeBound.height,
-                    width: this.shapeBound.width / 4
+                    height: this.shapeBound.height / 4,
+                    width: this.shapeBound.width
                 }
             } else if (this.rotation === 1) {
                 drawingRect = {
                     x: this.shapeBound.x,
                     y: this.shapeBound.y,
-                    height: this.shapeBound.height / 4,
-                    width: this.shapeBound.width
+                    height: this.shapeBound.height,
+                    width: this.shapeBound.width / 4
                 }
             }
             drawImage(this.ctx, this.image, drawingRect);
@@ -208,36 +209,40 @@ export class ShapeI extends Shape {
         let rotationNew = (this.rotation + 1) % 2;
 
         if (rotationNew === 0) {
-            let newCDM = [[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]];
+            let newCDM = [[1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
             if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                 this.rotation = rotationNew;
                 this.colisionDetectionMatrix = newCDM;
-                this.ctx.rotate(-Math.PI / 2);
+                this.image = GlobalImageMap.imageMap.get(Shapes[this.block].toString() + rotationNew.toString());
+                //this.ctx.rotate(-Math.PI / 2);
                 this.render();
-                this.ctx.restore();
+                //this.ctx.rotate(Math.PI/2);
             }
+            else
+                if (this.posX + 4 > this.board.getSizeX()) {
+                    let shiftByX = this.posX + 4 - this.board.getSizeX();
+                    if (this.board.tryPosition(this.posX - shiftByX, this.posY, newCDM)) {
+                        this.rotation = rotationNew;
+                        this.colisionDetectionMatrix = newCDM;
+                        this.image = GlobalImageMap.imageMap.get(Shapes[this.block].toString() + rotationNew.toString());
+                        this.posX -= shiftByX;
+                        //this.ctx.rotate(-Math.PI / 2);
+                        this.render();
+                        //this.ctx.rotate(Math.PI/2);
+                    }
+
+                }
         } else
             if (rotationNew === 1) {
-                let newCDM = [[1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
+                let newCDM = [[1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0], [1, 0, 0, 0]];
                 if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                     this.rotation = rotationNew;
                     this.colisionDetectionMatrix = newCDM;
-                    this.ctx.rotate(-Math.PI / 2);
+                    this.image = GlobalImageMap.imageMap.get(Shapes[this.block].toString() + rotationNew.toString());
+                    //this.ctx.rotate(-Math.PI / 2);
                     this.render();
-                    this.ctx.restore();
-                } else
-                    if (this.posX + 4 > this.board.getSizeX()) {
-                        let shiftByX = this.posX + 4 - this.board.getSizeX();
-                        if (this.board.tryPosition(this.posX - shiftByX, this.posY, newCDM)) {
-                            this.rotation = rotationNew;
-                            this.colisionDetectionMatrix = newCDM;
-                            this.posX-=shiftByX;
-                            this.ctx.rotate(-Math.PI / 2);
-                            this.render();
-                            this.ctx.restore();
-                        }
-
-                    }
+                    //this.ctx.rotate(Math.PI/2);
+                }
             }
 
     }
@@ -298,7 +303,7 @@ export class ShapeT extends Shape {
 
         if (this.shapeBound) {
             this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-            this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
             this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH
             this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
@@ -358,7 +363,7 @@ export class ShapeT extends Shape {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
             if (this.shapeBound) {
                 this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-                this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
                 this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
                 this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
             }
@@ -404,19 +409,21 @@ export class ShapeT extends Shape {
             if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                 this.rotation = rotationNew;
                 this.colisionDetectionMatrix = newCDM;
-                this.ctx.rotate(-Math.PI / 2);
+                this.image = GlobalImageMap.imageMap.get(Shapes[this.block].toString() + rotationNew.toString());
+                //this.ctx.rotate(-Math.PI / 2);
                 this.render();
-                this.ctx.restore();
+                //this.ctx.rotate(Math.PI/2);
             } else
                 if (this.posX + 3 > this.board.getSizeX()) {
                     let shiftByX = this.posX + 3 - this.board.getSizeX();
                     if (this.board.tryPosition(this.posX - shiftByX, this.posY, newCDM)) {
                         this.rotation = rotationNew;
                         this.colisionDetectionMatrix = newCDM;
-                        this.posX-=shiftByX;
-                        this.ctx.rotate(-Math.PI / 2);
+                        this.image = GlobalImageMap.imageMap.get(Shapes[this.block].toString() + rotationNew.toString());
+                        this.posX -= shiftByX;
+                        //this.ctx.rotate(-Math.PI / 2);
                         this.render();
-                        this.ctx.restore();
+                        //this.ctx.rotate(Math.PI/2);
                     }
 
                 }
@@ -426,9 +433,10 @@ export class ShapeT extends Shape {
                 if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                     this.rotation = rotationNew;
                     this.colisionDetectionMatrix = newCDM;
-                    this.ctx.rotate(-Math.PI / 2);
+                    this.image = GlobalImageMap.imageMap.get(Shapes[this.block].toString() + rotationNew.toString());
+                    //this.ctx.rotate(-Math.PI / 2);
                     this.render();
-                    this.ctx.restore();
+                    //this.ctx.rotate(Math.PI/2);
                 } //else
                 //     if (this.posX + 3 > this.board.getSizeX()) {
                 //         let shiftByX = this.posX + 3 - this.board.getSizeX();
@@ -444,19 +452,21 @@ export class ShapeT extends Shape {
                     if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                         this.rotation = rotationNew;
                         this.colisionDetectionMatrix = newCDM;
-                        this.ctx.rotate(-Math.PI / 2);
+                        this.image = GlobalImageMap.imageMap.get(Shapes[this.block].toString() + rotationNew.toString());
+                        //this.ctx.rotate(-Math.PI / 2);
                         this.render();
-                        this.ctx.restore();
+                        //this.ctx.rotate(Math.PI/2);
                     } else
                         if (this.posX + 3 > this.board.getSizeX()) {
                             let shiftByX = this.posX + 3 - this.board.getSizeX();
                             if (this.board.tryPosition(this.posX - shiftByX, this.posY, newCDM)) {
                                 this.rotation = rotationNew;
                                 this.colisionDetectionMatrix = newCDM;
-                                this.posX-=shiftByX;
-                                this.ctx.rotate(-Math.PI / 2);
+                                this.image = GlobalImageMap.imageMap.get(Shapes[this.block].toString() + rotationNew.toString());
+                                this.posX -= shiftByX;
+                                //this.ctx.rotate(-Math.PI / 2);
                                 this.render();
-                                this.ctx.restore();
+                                //this.ctx.rotate(Math.PI/2);
                             }
 
                         }
@@ -466,9 +476,10 @@ export class ShapeT extends Shape {
                         if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                             this.rotation = rotationNew;
                             this.colisionDetectionMatrix = newCDM;
-                            this.ctx.rotate(-Math.PI / 2);
+                            this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                            //this.ctx.rotate(-Math.PI / 2);
                             this.render();
-                            this.ctx.restore();
+                            //this.ctx.rotate(Math.PI/2);
                         } //else
                         //     if (this.posX + 3 > this.board.getSizeX()) {
                         //         let shiftByX = this.posX + 3 - this.board.getSizeX();
@@ -535,7 +546,7 @@ export class ShapeO extends Shape {
         }
         if (this.shapeBound) {
             this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-            this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
             this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
             this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
@@ -595,7 +606,7 @@ export class ShapeO extends Shape {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
             if (this.shapeBound) {
                 this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-                this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
                 this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
                 this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
             }
@@ -661,7 +672,7 @@ export class ShapeS extends Shape {
         }
         if (this.shapeBound) {
             this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-            this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
             this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
             this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
@@ -721,7 +732,7 @@ export class ShapeS extends Shape {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
             if (this.shapeBound) {
                 this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-                this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
                 this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
                 this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
             }
@@ -751,19 +762,21 @@ export class ShapeS extends Shape {
             if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                 this.rotation = rotationNew;
                 this.colisionDetectionMatrix = newCDM;
-                this.ctx.rotate(-Math.PI / 2);
+                this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                //this.ctx.rotate(-Math.PI / 2);
                 this.render();
-                this.ctx.restore();
+                //this.ctx.rotate(Math.PI/2);
             } else
                 if (this.posX + 3 > this.board.getSizeX()) {
                     let shiftByX = this.posX + 3 - this.board.getSizeX();
                     if (this.board.tryPosition(this.posX - shiftByX, this.posY, newCDM)) {
                         this.rotation = rotationNew;
                         this.colisionDetectionMatrix = newCDM;
-                        this.posX-=shiftByX;
-                        this.ctx.rotate(-Math.PI / 2);
+                        this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                        this.posX -= shiftByX;
+                        //this.ctx.rotate(-Math.PI / 2);
                         this.render();
-                        this.ctx.restore();
+                        //this.ctx.rotate(Math.PI/2);
                     }
 
                 }
@@ -773,9 +786,10 @@ export class ShapeS extends Shape {
                 if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                     this.rotation = rotationNew;
                     this.colisionDetectionMatrix = newCDM;
-                    this.ctx.rotate(-Math.PI / 2);
+                    this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                    //this.ctx.rotate(-Math.PI / 2);
                     this.render();
-                    this.ctx.restore();
+                    //this.ctx.rotate(Math.PI/2);
                 }// else
                 //     if (this.posX + 3 > this.board.getSizeX()) {
                 //         let shiftByX = this.posX + 3 - this.board.getSizeX();
@@ -844,7 +858,7 @@ export class ShapeZ extends Shape {
         }
         if (this.shapeBound) {
             this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-            this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
             this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
             this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
@@ -905,7 +919,7 @@ export class ShapeZ extends Shape {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
             if (this.shapeBound) {
                 this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-                this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
                 this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
                 this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
             }
@@ -931,23 +945,25 @@ export class ShapeZ extends Shape {
     rotate(): void {
         let rotationNew = (this.rotation + 1) % 2;
         if (rotationNew === 0) {
-            let newCDM = [[1, 1,], [0, 1, 1], [0, 0, 0]];
+            let newCDM = [[1, 1, 0], [0, 1, 1], [0, 0, 0]];
             if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                 this.rotation = rotationNew;
                 this.colisionDetectionMatrix = newCDM;
-                this.ctx.rotate(-Math.PI / 2);
+                this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                //this.ctx.rotate(-Math.PI / 2);
                 this.render();
-                this.ctx.restore();
+                //this.ctx.rotate(Math.PI/2);
             } else
                 if (this.posX + 3 > this.board.getSizeX()) {
                     let shiftByX = this.posX + 3 - this.board.getSizeX();
                     if (this.board.tryPosition(this.posX - shiftByX, this.posY, newCDM)) {
                         this.rotation = rotationNew;
                         this.colisionDetectionMatrix = newCDM;
-                        this.posX-=shiftByX;
-                        this.ctx.rotate(-Math.PI / 2);
+                        this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                        this.posX -= shiftByX;
+                        //this.ctx.rotate(-Math.PI / 2);
                         this.render();
-                        this.ctx.restore();
+                        //this.ctx.rotate(Math.PI/2);
                     }
 
                 }
@@ -957,9 +973,10 @@ export class ShapeZ extends Shape {
                 if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                     this.rotation = rotationNew;
                     this.colisionDetectionMatrix = newCDM;
-                    this.ctx.rotate(-Math.PI / 2);
+                    this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                    //this.ctx.rotate(-Math.PI / 2);
                     this.render();
-                    this.ctx.restore();
+                    //this.ctx.rotate(Math.PI/2);
                 }// else
                 //     if (this.posX + 3 > this.board.getSizeX()) {
                 //         let shiftByX = this.posX + 3 - this.board.getSizeX();
@@ -1026,7 +1043,7 @@ export class ShapeL extends Shape {
         }
         if (this.shapeBound) {
             this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-            this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
             this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
             this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
@@ -1087,7 +1104,7 @@ export class ShapeL extends Shape {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
             if (this.shapeBound) {
                 this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-                this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
                 this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
                 this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
             }
@@ -1133,19 +1150,21 @@ export class ShapeL extends Shape {
             if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                 this.rotation = rotationNew;
                 this.colisionDetectionMatrix = newCDM;
-                this.ctx.rotate(-Math.PI / 2);
+                this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                //this.ctx.rotate(-Math.PI / 2);
                 this.render();
-                this.ctx.restore();
+                //this.ctx.rotate(Math.PI/2);
             } else
                 if (this.posX + 3 > this.board.getSizeX()) {
                     let shiftByX = this.posX + 3 - this.board.getSizeX();
                     if (this.board.tryPosition(this.posX - shiftByX, this.posY, newCDM)) {
                         this.rotation = rotationNew;
                         this.colisionDetectionMatrix = newCDM;
-                        this.posX-=shiftByX;
-                        this.ctx.rotate(-Math.PI / 2);
+                        this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                        this.posX -= shiftByX;
+                        //this.ctx.rotate(-Math.PI / 2);
                         this.render();
-                        this.ctx.restore();
+                        //this.ctx.rotate(Math.PI/2);
                     }
 
                 }
@@ -1155,9 +1174,10 @@ export class ShapeL extends Shape {
                 if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                     this.rotation = rotationNew;
                     this.colisionDetectionMatrix = newCDM;
-                    this.ctx.rotate(-Math.PI / 2);
+                    this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                    //this.ctx.rotate(-Math.PI / 2);
                     this.render();
-                    this.ctx.restore();
+                    //this.ctx.rotate(Math.PI/2);
                 }// else
                 //     if (this.posX + 3 > this.board.getSizeX()) {
                 //         let shiftByX = this.posX + 3 - this.board.getSizeX();
@@ -1173,19 +1193,21 @@ export class ShapeL extends Shape {
                     if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                         this.rotation = rotationNew;
                         this.colisionDetectionMatrix = newCDM;
-                        this.ctx.rotate(-Math.PI / 2);
+                        this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                        //this.ctx.rotate(-Math.PI / 2);
                         this.render();
-                        this.ctx.restore();
+                        //this.ctx.rotate(Math.PI/2);
                     } else
                         if (this.posX + 3 > this.board.getSizeX()) {
                             let shiftByX = this.posX + 3 - this.board.getSizeX();
                             if (this.board.tryPosition(this.posX - shiftByX, this.posY, newCDM)) {
                                 this.rotation = rotationNew;
                                 this.colisionDetectionMatrix = newCDM;
-                                this.posX-=shiftByX;
-                                this.ctx.rotate(-Math.PI / 2);
+                                this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                                this.posX -= shiftByX;
+                                //this.ctx.rotate(-Math.PI / 2);
                                 this.render();
-                                this.ctx.restore();
+                                //this.ctx.rotate(Math.PI/2);
                             }
 
                         }
@@ -1195,9 +1217,10 @@ export class ShapeL extends Shape {
                         if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                             this.rotation = rotationNew;
                             this.colisionDetectionMatrix = newCDM;
-                            this.ctx.rotate(-Math.PI / 2);
+                            this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                            //this.ctx.rotate(-Math.PI / 2);
                             this.render();
-                            this.ctx.restore();
+                            //this.ctx.rotate(Math.PI/2);
                         }// else
                         //     if (this.posX + 3 > this.board.getSizeX()) {
                         //         let shiftByX = this.posX + 3 - this.board.getSizeX();
@@ -1264,7 +1287,7 @@ export class ShapeJ extends Shape {
         }
         if (this.shapeBound) {
             this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-            this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
             this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
             this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
@@ -1325,7 +1348,7 @@ export class ShapeJ extends Shape {
         if (this.bgBound.x <= this.ctx.canvas.width && this.moving) {
             if (this.shapeBound) {
                 this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-                this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
                 this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
                 this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
             }
@@ -1371,19 +1394,21 @@ export class ShapeJ extends Shape {
             if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                 this.rotation = rotationNew;
                 this.colisionDetectionMatrix = newCDM;
-                this.ctx.rotate(-Math.PI / 2);
+                this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                //this.ctx.rotate(-Math.PI / 2);
                 this.render();
-                this.ctx.restore();
+                //this.ctx.rotate(Math.PI/2);
             } else
                 if (this.posX + 3 > this.board.getSizeX()) {
                     let shiftByX = this.posX + 3 - this.board.getSizeX();
                     if (this.board.tryPosition(this.posX - shiftByX, this.posY, newCDM)) {
                         this.rotation = rotationNew;
                         this.colisionDetectionMatrix = newCDM;
-                        this.posX-=shiftByX;
-                        this.ctx.rotate(-Math.PI / 2);
+                        this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                        this.posX -= shiftByX;
+                        //this.ctx.rotate(-Math.PI / 2);
                         this.render();
-                        this.ctx.restore();
+                        //this.ctx.rotate(Math.PI/2);
                     }
 
                 }
@@ -1393,9 +1418,10 @@ export class ShapeJ extends Shape {
                 if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                     this.rotation = rotationNew;
                     this.colisionDetectionMatrix = newCDM;
-                    this.ctx.rotate(-Math.PI / 2);
+                    this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                    //this.ctx.rotate(-Math.PI / 2);
                     this.render();
-                    this.ctx.restore();
+                    //this.ctx.rotate(Math.PI/2);
                 }// else
                 //     if (this.posX + 3 > this.board.getSizeX()) {
                 //         let shiftByX = this.posX + 3 - this.board.getSizeX();
@@ -1411,19 +1437,21 @@ export class ShapeJ extends Shape {
                     if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                         this.rotation = rotationNew;
                         this.colisionDetectionMatrix = newCDM;
-                        this.ctx.rotate(-Math.PI / 2);
+                        this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                        //this.ctx.rotate(-Math.PI / 2);
                         this.render();
-                        this.ctx.restore();
+                        //this.ctx.rotate(Math.PI/2);
                     } else
                         if (this.posX + 3 > this.board.getSizeX()) {
                             let shiftByX = this.posX + 3 - this.board.getSizeX();
                             if (this.board.tryPosition(this.posX - shiftByX, this.posY, newCDM)) {
                                 this.rotation = rotationNew;
                                 this.colisionDetectionMatrix = newCDM;
-                                this.posX-=shiftByX;
-                                this.ctx.rotate(-Math.PI / 2);
+                                this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                                this.posX -= shiftByX;
+                                //this.ctx.rotate(-Math.PI / 2);
                                 this.render();
-                                this.ctx.restore();
+                                //this.ctx.rotate(Math.PI/2);
                             }
 
                         }
@@ -1433,9 +1461,10 @@ export class ShapeJ extends Shape {
                         if (this.board.tryPosition(this.posX, this.posY, newCDM)) {
                             this.rotation = rotationNew;
                             this.colisionDetectionMatrix = newCDM;
-                            this.ctx.rotate(-Math.PI / 2);
+                            this.image=GlobalImageMap.imageMap.get(Shapes[this.block].toString()+rotationNew.toString());
+                            //this.ctx.rotate(-Math.PI / 2);
                             this.render();
-                            this.ctx.restore();
+                            //this.ctx.rotate(Math.PI/2);
                         }// else
                         //     if (this.posX + 3 > this.board.getSizeX()) {
                         //         let shiftByX = this.posX + 3 - this.board.getSizeX();
@@ -1483,11 +1512,22 @@ export class Block extends Shape {
         this.type = type;
     }
 
-
+    getImage():HTMLImageElement{
+        return this.image;
+    }
+    getBlock():Shapes{
+        return this.block
+    }
+    getBgBounds():IRectangle{
+        return this.bgBound;
+    }
+    getType():string{
+        return this.type;
+    }
     onCreate(): boolean {
         if (this.board) {
             const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
-            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
+            // console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -1504,7 +1544,7 @@ export class Block extends Shape {
         }
         if (this.shapeBound) {
             this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-            this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+            this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
             this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
             this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
         }
@@ -1515,7 +1555,7 @@ export class Block extends Shape {
         if (this.bgBound.x <= this.ctx.canvas.width) {
             if (this.shapeBound) {
                 this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-                this.shapeBound.y = this.bgBound.height * BOARD_BLOCK_SHIFT_Y + this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
                 this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
                 this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
                 drawImage(this.ctx, this.image, this.shapeBound);
