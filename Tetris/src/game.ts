@@ -7,7 +7,7 @@ import { Highscores } from "./components/highscores";
 import { Overlay } from "./components/overlay";
 import { Background } from "./components/background";
 import { IGameState } from "./interfaces/IGameState";
-import { BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH, GAME_SPEED, INITIAL_GAME_STATE, MIN_INTERVAL_MS } from "./config";
+import { BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH, GAME_SPEED, INITIAL_GAME_STATE, MIN_INTERVAL_MS, SHAPE_DROP_SCORE } from "./config";
 import { decreasingIntervalObservable, formula } from "./services/gameTicker";
 // import { shapeSpawner } from "./services/shapeSpawner";
 import { initializeMainLoop } from "./services/renderLoop";
@@ -17,6 +17,7 @@ import { Board } from "./components/board";
 import { startSpawningShapes } from "./services/shapeSpawner";
 import { IBoolWrapper } from "./interfaces/IBoolWrapper";
 import { TickerReset } from "./components/TikerReset";
+import { IUsersScores } from "./interfaces/IUsersScores";
 // import { getKeysDown } from "./services/keybordInputService";
 export class Game {
     private readonly canvas: HTMLCanvasElement;
@@ -99,11 +100,14 @@ export class Game {
             this.shapeSubscription = this.shapeSpawner$.subscribe(
                 (shape) => {
                     if (shape) {
-                        console.log("log from subscribe", shape);
+                        //console.log("log from subscribe", shape);
                         if (shape.onCreate() === false) {
                             this.die();
                         }
                         this.shapes.push(shape);
+                        Game.gameState.player.score+=SHAPE_DROP_SCORE;
+                        Game.gameState.score+=SHAPE_DROP_SCORE;
+                        Game.gameState.player.elementsDroped+=1;
                         // console.log(shape);
                         console.log('SHAPE LENGth', this.shapes.length);
                     }
@@ -191,7 +195,16 @@ export class Game {
 
         if (Game.gameState.score > Game.gameState.player.highscore) {
             Game.gameState.player.highscore = Game.gameState.score;
-            putPlayerProfile(Game.gameState.player).then((player) => {
+            let userScore:IUsersScores={
+                id:Game.gameState.player.id,
+                username:Game.gameState.player.username,
+                highscore:Game.gameState.player.highscore,
+                linesCleared:Game.gameState.player.linesCleared,
+                elementsDroped:Game.gameState.player.elementsDroped,
+                timePlaying:Game.gameState.player.timePlaying
+            };
+
+            putPlayerProfile(userScore).then((player) => {
                 Game.gameState.player = { ...player, score:Game.gameState.score };
             });
         }

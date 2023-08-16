@@ -7,6 +7,7 @@ import { fetchHighScore$ } from "../services/apiServices";
 import { Component } from "./component";
 import { drawText } from "../services/renderServices";
 import { MEDIUM_TEXT_FONT } from "../config";
+import { Game } from "../game";
 
 export class Highscores extends Component {
     private _shown: boolean;
@@ -20,10 +21,9 @@ export class Highscores extends Component {
     }
 
     update(delta: number, keysDown: IKeysDown): void {
-        if (this.gameState.currentState === GamePhase.READY) {
+        if (Game.gameState.currentState === GamePhase.READY||Game.gameState.currentState===GamePhase.GAME_OVER) {
             // console.log('sup from highcores update');
             if (keysDown['KeyH']) {
-                console.log("key registered from highscores update line 26");
                 this._shown = !this._shown;
                 if (this._shown) {
                     fetchHighScore$()
@@ -32,6 +32,8 @@ export class Highscores extends Component {
                     )
                         .subscribe((scores) => {
                             this._highscores = scores;
+                            console.log(scores);
+                            console.log(this._highscores);
                         });
                 }
             }
@@ -56,7 +58,7 @@ export class Highscores extends Component {
                         .toString().padStart(2)}`,
                     MEDIUM_TEXT_FONT,
                     this.ctx.canvas.width * 0.6,
-                    50 ** index + 150,
+                    50 * index + 150,
                 );
             });
         }

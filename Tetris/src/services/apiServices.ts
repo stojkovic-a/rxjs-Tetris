@@ -58,7 +58,7 @@ const putPlayerProfile = (player: IUsersScores): Promise<IUsersScores> => {
     let method: string;
     let route: string;
 
-    if (player.id> 0) {
+    if (player.id!== 0) {
         method = 'PUT';
         route = `/users/${player.id}`
     }else{

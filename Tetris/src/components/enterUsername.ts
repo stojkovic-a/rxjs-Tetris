@@ -67,7 +67,7 @@ export class EnterUsername extends Component {
                 tap((playerInfo: IUsersScores[]) => {
                     if (playerInfo.length === 0) {
                         this.gameState.player={
-                            id:-1,
+                            id:0,
                             score:0,
                             linesCleared:0,
                             elementsDroped:0,
@@ -82,7 +82,7 @@ export class EnterUsername extends Component {
                 catchError((error: any) => {
                     console.error("Profile not found");
                     this.gameState.player = {
-                        id: -1,
+                        id:0 ,
                         score: 0,
                         linesCleared: 0,
                         elementsDroped: 0,

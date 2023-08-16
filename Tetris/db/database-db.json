@@ -3,28 +3,50 @@
     {
       "id": 1,
       "username": "aleksandar",
-      "highscore": 1100,
+      "highscore": 5000,
       "linesCleared": 1,
       "elementsDroped": 0,
-      "timePlaying": 0,
-      "score": 1100
+      "timePlaying": 0
     },
     {
       "id": 2,
       "username": "milan",
-      "highscore": 0,
+      "highscore": 1000,
       "linesCleared": 0,
       "elementsDroped": 0,
       "timePlaying": 0
     },
     {
-      "id": -1,
-      "score": 1300,
+      "id": 3,
+      "username": "aca",
+      "highscore": 4080,
+      "linesCleared": 14,
+      "elementsDroped": 62,
+      "timePlaying": 0
+    },
+    {
+      "id": 4,
+      "username": "Tester",
+      "highscore": 900,
       "linesCleared": 0,
       "elementsDroped": 0,
-      "timePlaying": 0,
-      "highscore": 1300,
-      "username": "aca"
+      "timePlaying": 0
+    },
+    {
+      "id": 5,
+      "username": "Test01",
+      "highscore": 1400,
+      "linesCleared": 0,
+      "elementsDroped": 0,
+      "timePlaying": 0
+    },
+    {
+      "id": 6,
+      "username": "test02",
+      "highscore": 2920,
+      "linesCleared": 9,
+      "elementsDroped": 48,
+      "timePlaying": 0
     }
   ],
   "sprites": {

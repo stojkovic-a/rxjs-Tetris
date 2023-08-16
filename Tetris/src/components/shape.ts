@@ -104,7 +104,7 @@ export class ShapeI extends Shape {
     onCreate(): boolean {
         if (this.board) {
             const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
-            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
+            //console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -129,7 +129,7 @@ export class ShapeI extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
-            console.log(keysDown);
+           // console.log(keysDown);
             if (keysDown['ArrowUp']) {
                 this.rotate();
                 return -1;
@@ -286,7 +286,7 @@ export class ShapeT extends Shape {
     onCreate(): boolean {
         if (this.board) {
             const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
-            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
+            //console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -311,7 +311,7 @@ export class ShapeT extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
-            console.log(keysDown);
+           // console.log(keysDown);
             if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
@@ -529,7 +529,7 @@ export class ShapeO extends Shape {
     onCreate(): boolean {
         if (this.board) {
             const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
-            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
+            //(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -554,7 +554,7 @@ export class ShapeO extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
-            console.log(keysDown);
+           // console.log(keysDown);
             if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
@@ -655,7 +655,7 @@ export class ShapeS extends Shape {
     onCreate(): boolean {
         if (this.board) {
             const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
-            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
+            //console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -680,7 +680,7 @@ export class ShapeS extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
-            console.log(keysDown);
+          //  console.log(keysDown);
             if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
@@ -841,7 +841,7 @@ export class ShapeZ extends Shape {
     onCreate(): boolean {
         if (this.board) {
             const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
-            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
+            //console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -867,7 +867,7 @@ export class ShapeZ extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
-            console.log(keysDown);
+           // console.log(keysDown);
             if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
@@ -1026,7 +1026,7 @@ export class ShapeL extends Shape {
     onCreate(): boolean {
         if (this.board) {
             const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
-            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
+            //console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -1052,7 +1052,7 @@ export class ShapeL extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
-            console.log(keysDown);
+            //console.log(keysDown);
             if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;
@@ -1270,7 +1270,7 @@ export class ShapeJ extends Shape {
     onCreate(): boolean {
         if (this.board) {
             const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
-            console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
+          //  console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -1296,7 +1296,7 @@ export class ShapeJ extends Shape {
 
     update(delta: number, keysDown: IKeysDown): number {
         if (this.gameState.currentState === GamePhase.PLAYING && this.moving) {
-            console.log(keysDown);
+           // console.log(keysDown);
             if (keysDown["ArrowUp"]) {
                 this.rotate();
                 return -1;

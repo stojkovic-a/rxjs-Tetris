@@ -50,16 +50,23 @@ export class Overlay extends Component {
             10,
             this.ctx.canvas.height - 30,
         );
+        drawText(
+            this.ctx,
+            '[Space]-Start',
+            SMALL_TEXT_FONT,
+            10,
+            this.ctx.canvas.height - 55,
+        );
     }
 
     renderCurrentScore(): void {
-        const scoreText = Game.gameState.player.score.toString();
+        const scoreText = Game.gameState.score.toString();
         drawText(
             this.ctx,
             scoreText,
             LARGE_TEXT_FONT,
-            this.ctx.canvas.width + 5,
-            this.ctx.canvas.height + 5
+             70,
+             70
         );
     }
 

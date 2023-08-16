@@ -8,6 +8,7 @@ import { Block, Shape } from "./shape";
 import { Game } from "../game";
 import { GlobalImageMap } from "./globalImageMap";
 import { Shapes } from "../enums/Shapes";
+import { scoreFormula } from "../services/scoreFormula";
 
 export class Board extends Component {
     private _sizeX: number;
@@ -165,8 +166,9 @@ export class Board extends Component {
                 this.lowerFlyingRows(i);
             }
         }
-        this.gameState.score += 100 * numRemoved;
-        this.gameState.player.score += 100 * numRemoved;
+        this.gameState.score +=scoreFormula(numRemoved);
+        this.gameState.player.score +=scoreFormula(numRemoved);
+        Game.gameState.player.linesCleared+=numRemoved;
         return numRemoved;
     }
 
@@ -236,7 +238,7 @@ export class Board extends Component {
                         shape.posY + i,
                         shape.block.toString());
                     this._blocks[i + shape.posY][j + shape.posX].render();
-                    console.log(this._blocks[i + shape.posY][j + shape.posX].type);
+                    //console.log(this._blocks[i + shape.posY][j + shape.posX].type);
                 }
             }
         }
