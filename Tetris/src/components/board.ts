@@ -166,9 +166,9 @@ export class Board extends Component {
                 this.lowerFlyingRows(i);
             }
         }
-        this.gameState.score +=scoreFormula(numRemoved);
-        this.gameState.player.score +=scoreFormula(numRemoved);
-        Game.gameState.player.linesCleared+=numRemoved;
+        this.gameState.score += scoreFormula(numRemoved);
+        this.gameState.player.score += scoreFormula(numRemoved);
+        Game.gameState.player.linesCleared += numRemoved;
         return numRemoved;
     }
 
@@ -220,10 +220,6 @@ export class Board extends Component {
         for (let i = 0; i < shape.colisionDetectionMatrix.length; i++) {
             for (let j = 0; j < shape.colisionDetectionMatrix[0].length; j++) {
                 if (shape.colisionDetectionMatrix[i][j] === 1) {
-                    // console.log("ggggggggggggggggggggggggg",shape)
-                    // console.log("ppppppppppppppppppp",Shapes[shape.block]);
-                    // console.log('asasdasadasadsads',GlobalImageMap.imageMap.get(shape.block.toString()+'block'));
-                    // console.log(GlobalImageMap.imageMap);
                     this._blocks[i + shape.posY][j + shape.posX] = new Block(
                         this.ctx,
                         this.gameState,

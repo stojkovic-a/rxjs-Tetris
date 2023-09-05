@@ -6,5 +6,6 @@ export enum Shapes{
     Z=4,
     L=5,
     J=6,
+    
 
 }

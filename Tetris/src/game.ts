@@ -1,7 +1,7 @@
 import { Observable, Subscription, debounceTime, fromEvent } from "rxjs";
 import { GamePhase } from "./enums/GamePhase";
 import { loadBackgroundImage$, loadShapeSprites$ } from "./services/imageLoader";
-import { Shape, ShapeI } from "./components/shape";
+import { Shape } from "./components/shape";
 import { EnterUsername } from "./components/enterUsername";
 import { Highscores } from "./components/highscores";
 import { Overlay } from "./components/overlay";

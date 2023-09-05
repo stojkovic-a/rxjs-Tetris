@@ -19,9 +19,9 @@
     {
       "id": 3,
       "username": "aca",
-      "highscore": 4080,
+      "highscore": 4680,
       "linesCleared": 14,
-      "elementsDroped": 62,
+      "elementsDroped": 179,
       "timePlaying": 0
     },
     {
@@ -47,87 +47,51 @@
       "linesCleared": 9,
       "elementsDroped": 48,
       "timePlaying": 0
+    },
+    {
+      "id": 7,
+      "username": "idemo",
+      "highscore": 2820,
+      "linesCleared": 11,
+      "elementsDroped": 43,
+      "timePlaying": 0
+    },
+    {
+      "id": 8,
+      "username": "proba",
+      "highscore": 760,
+      "linesCleared": 0,
+      "elementsDroped": 19,
+      "timePlaying": 0
+    },
+    {
+      "id": 9,
+      "username": "dfsgsf",
+      "highscore": 780,
+      "linesCleared": 1,
+      "elementsDroped": 27,
+      "timePlaying": 0
+    },
+    {
+      "id": 10,
+      "username": "asd",
+      "highscore": 4020,
+      "linesCleared": 15,
+      "elementsDroped": 53,
+      "timePlaying": 0
+    },
+    {
+      "id": 11,
+      "username": "Filip Dojchinovic",
+      "highscore": 2860,
+      "linesCleared": 7,
+      "elementsDroped": 49,
+      "timePlaying": 0
     }
   ],
   "sprites": {
     "path": "./src/assets/",
     "shapes": [
-      {
-        "type": "I0",
-        "image": "I0.png"
-      },
-      {
-        "type": "I1",
-        "image": "I1.png"
-      },
-      {
-        "type": "J0",
-        "image": "J0.png"
-      },
-      {
-        "type": "J1",
-        "image": "J1.png"
-      },
-      {
-        "type": "J2",
-        "image": "J2.png"
-      },
-      {
-        "type": "J3",
-        "image": "J3.png"
-      },
-      {
-        "type": "L0",
-        "image": "L0.png"
-      },
-      {
-        "type": "L1",
-        "image": "L1.png"
-      },
-      {
-        "type": "L2",
-        "image": "L2.png"
-      },
-      {
-        "type": "L3",
-        "image": "L3.png"
-      },
-      {
-        "type": "O0",
-        "image": "O0.png"
-      },
-      {
-        "type": "S0",
-        "image": "S0.png"
-      },
-      {
-        "type": "S1",
-        "image": "S1.png"
-      },
-      {
-        "type": "T0",
-        "image": "T0.png"
-      },
-      {
-        "type": "T1",
-        "image": "T1.png"
-      },
-      {
-        "type": "T2",
-        "image": "T2.png"
-      },
-      {
-        "type": "T3",
-        "image": "T3.png"
-      },
-      {
-        "type": "Z0",
-        "image": "Z0.png"
-      },
-      {
-        "type": "Z1",
-        "image": "Z1.png"
-      },
       {
         "type": "Iblock",
         "image": "Iblock.png"
