@@ -26,7 +26,7 @@ export class Highscores extends Component {
             if (keysDown['KeyH']) {
                 this._shown = !this._shown;
                 if (this._shown) {
-                    fetchHighScore$()
+                    let subscription=fetchHighScore$()
                         .pipe(
                         //toArray()
                     )
@@ -34,6 +34,7 @@ export class Highscores extends Component {
                             this._highscores = scores;
                             console.log(scores);
                             console.log(this._highscores);
+                            subscription.unsubscribe();
                         });
                 }
             }

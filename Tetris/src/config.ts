@@ -21,8 +21,8 @@ export const BOARD_BLOCK_SHIFT_Y = 1 / 19;
 export const SMALL_TEXT_FONT = '1rem "Press Start 2P"';
 export const MEDIUM_TEXT_FONT = '2rem "Press Start 2P"';
 export const LARGE_TEXT_FONT = '3rem "Press Start 2P"';
-export const FONT_COLOR = 'white';
-export const FONT_SHADOW_COLOR = 'gray';
+export const FONT_COLOR = 'red';
+export const FONT_SHADOW_COLOR = 'blue';
 export const FONT_SHADOW_SIZE = 3;
 
 export const STARTING_DELTA_TIME = 0.8;
@@ -68,3 +68,10 @@ export const GAME_SPEED = 1;
 export const SHAPE_DROP_SCORE = 40;
 export const LINE_CLEAR_COEF = 100;
 export const LINE_CLEAR_OFFSET = 50;
+
+export const STARTING_POS_X=3;
+export const STARTING_POS_Y=0;
+
+export const BACKGROUN_RGB_STRING='32, 33, 36'
+
+export const FALLING_NUM_OF_FRAMES=20

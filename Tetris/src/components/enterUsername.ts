@@ -63,6 +63,7 @@ export class EnterUsername extends Component {
         if (this._username.length > 0) {
             this.gameState.player.username = this._username;
             this.gameState.currentState = GamePhase.READY;
+            let subscription=
             fetchPlayerProfile$(this.gameState.player.username).pipe(
                 tap((playerInfo: IUsersScores[]) => {
                     if (playerInfo.length === 0) {
@@ -95,6 +96,7 @@ export class EnterUsername extends Component {
             )
                 .subscribe((player: IPlayerInfo) => {
                     console.log(player);
+                    subscription.unsubscribe();
                 })
         }
     }

@@ -1,11 +1,11 @@
-import { Observable, defer, filter, interval, map, of, switchMap, take, tap, toArray } from "rxjs";
+import { Observable, config, defer, filter, interval, map, of, switchMap, take, tap, toArray } from "rxjs";
 import { IGameState } from "../interfaces/IGameState";
 import { Shape,/* ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT, ShapeZ*/ } from "../components/shape";
 import { loadBackgroundImage$, loadShapeSprites$ } from "./imageLoader";
 import { Shapes } from "../enums/Shapes";
 import { Board } from "../components/board";
 import { IRectangle } from "../interfaces/IRectangle";
-import { INITAIAL_SHAPES, MIN_INTERVAL_MS, NUM_SHAPES } from "../config";
+import { INITAIAL_SHAPES, MIN_INTERVAL_MS, NUM_SHAPES, STARTING_POS_X, STARTING_POS_Y } from "../config";
 import { IBoolWrapper } from "../interfaces/IBoolWrapper";
 import { Game } from "../game";
 import { GlobalImageMap } from "../components/globalImageMap";
@@ -25,23 +25,51 @@ function returnShapeFromNumber(
     board: Board,
     bgRect: IRectangle
 ): Observable<Shape> {
-    return loadShapeSprites$().pipe(
-        switchMap(sprites => {
-            console.log(sprites,"AAAAAAAAAAAAAA");
-            let images: Map<string, HTMLImageElement> = new Map();
+    let enumKey = Shapes[num];
+    if (GlobalImageMap.imageMap.size === NUM_SHAPES) {
+        let shapeToReturn: Shape = new Shape(
+            ctx,
+            gameState,
+            Shapes[enumKey as keyof typeof Shapes],
+            0,
+            INITAIAL_SHAPES.get(enumKey),
+            true,
+            board,
+            bgRect,
+            STARTING_POS_X,
+            STARTING_POS_Y
+        );
+        // console.log(shapeToReturn);
+        return of(shapeToReturn);
+    } else {
+        return loadShapeSprites$().pipe(
+            switchMap(sprites => {
+                let images: Map<string, HTMLImageElement> = new Map();
 
-            images.set(sprites.type, sprites.img);
-            GlobalImageMap.imageMap.set(sprites.type, sprites.img);
+                images.set(sprites.type, sprites.img);
+                GlobalImageMap.imageMap.set(sprites.type, sprites.img);
 
-            let shapeToReturn: Shape;
-            
-            let enumKey = Shapes[num];
-            if (sprites.type === enumKey.toString() + "block")
-                shapeToReturn = new Shape(ctx, gameState, images.get(enumKey.toString() + "block"), Shapes[enumKey as keyof typeof Shapes], 0, INITAIAL_SHAPES.get(enumKey), true, board, bgRect, 3, 0);
+                let shapeToReturn: Shape;
 
-            return of(shapeToReturn);
-        })
-    );
+
+                if (sprites.type === enumKey.toString() + "block")
+                    shapeToReturn = new Shape(
+                        ctx,
+                        gameState,
+                        Shapes[enumKey as keyof typeof Shapes],
+                        0,
+                        INITAIAL_SHAPES.get(enumKey),
+                        true,
+                        board,
+                        bgRect,
+                        STARTING_POS_X,
+                        STARTING_POS_Y
+                    );
+                // console.log(shapeToReturn);
+                return of(shapeToReturn);
+            })
+        );
+    }
 }
 
 export function startSpawningShapes(

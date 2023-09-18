@@ -6,7 +6,7 @@ import { IShapeTypes } from "../interfaces/IShapeTypes";
 import { Shapes } from "../enums/Shapes";
 import { Board } from "./board";
 import { IRectangle } from "../interfaces/IRectangle";
-import { BACKGROUND_ASPECT_RATIO, BACKGROUND_BLOCKS_HEIGHT, BACKGROUND_BLOCKS_WIDTH, BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH, BOARD_BLOCK_SHIFT_X, BOARD_BLOCK_SHIFT_Y, BOARD_BORDER_SHIFT_X, BOARD_BORDER_SHIFT_Y } from "../config";
+import { BACKGROUND_ASPECT_RATIO, BACKGROUND_BLOCKS_HEIGHT, BACKGROUND_BLOCKS_WIDTH, BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH, BOARD_BLOCK_SHIFT_X, BOARD_BLOCK_SHIFT_Y, BOARD_BORDER_SHIFT_X, BOARD_BORDER_SHIFT_Y, FALLING_NUM_OF_FRAMES } from "../config";
 import { drawImage } from "../services/renderServices";
 import { GamePhase } from "../enums/GamePhase";
 import { Game } from "../game";
@@ -28,7 +28,6 @@ export class Shape extends Component {
     constructor(
         ctx: CanvasRenderingContext2D,
         gameState: IGameState,
-        image: HTMLImageElement,
         block: Shapes,
         tickTime: number,
         cdm: number[][],
@@ -39,7 +38,7 @@ export class Shape extends Component {
         posY: number
     ) {
         super(ctx, gameState);
-        this.image = image;
+        this.image = GlobalImageMap.imageMap.get(Shapes[block].toString() + "block");
         this.posX = posX;
         this.posY = posY;
         this.rotation = 0;
@@ -206,7 +205,7 @@ export class Shape extends Component {
             }
         }
         if (minColumn > maxColumn)
-            throw new Error("Impossbiel shape");
+            throw new Error("Impossible shape");
 
         return (maxColumn - minColumn + 1) / this.colisionDetectionMatrix[0].length;
     }
@@ -398,10 +397,11 @@ export class Shape extends Component {
 
 export class Block extends Shape {
     public type: string;
+    currentFallingFrame: number;
+    animationPositionY: number;
     constructor(
         ctx: CanvasRenderingContext2D,
         gameState: IGameState,
-        image: HTMLImageElement,
         block: Shapes,
         tickTime: number,
         moving: boolean,
@@ -409,11 +409,11 @@ export class Block extends Shape {
         bgBounds: IRectangle,
         posX: number,
         posY: number,
-        type: string
+        type: string,
+        animationPositionY: number
     ) {
         super(ctx,
             gameState,
-            image,
             block,
             tickTime,
             [[1]],
@@ -424,6 +424,8 @@ export class Block extends Shape {
             posY
         );
         this.type = type;
+        this.currentFallingFrame = 0;
+        this.animationPositionY=animationPositionY;
     }
 
     getImage(): HTMLImageElement {
@@ -469,7 +471,7 @@ export class Block extends Shape {
         if (this.bgBound.x <= this.ctx.canvas.width) {
             if (this.shapeBound) {
                 this.shapeBound.x = this.bgBound.x + this.bgBound.width * BOARD_BLOCK_SHIFT_X + this.posX * BOARD_BLOCK_SHIFT_X * this.bgBound.width
-                this.shapeBound.y = this.posY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
+                this.shapeBound.y = this.animationPositionY * BOARD_BLOCK_SHIFT_Y * this.bgBound.height;
                 this.shapeBound.width = this.colisionDetectionMatrix.length * this.bgBound.width / BACKGROUND_BLOCKS_WIDTH;
                 this.shapeBound.height = this.colisionDetectionMatrix[0].length * this.bgBound.height / BACKGROUND_BLOCKS_HEIGHT;
                 drawImage(this.ctx, this.image, this.shapeBound);
@@ -478,13 +480,28 @@ export class Block extends Shape {
     }
 
     update(delta: number, keysDown: IKeysDown): number {
-        return 1;
+        if (this.moving) {
+            if (this.currentFallingFrame < FALLING_NUM_OF_FRAMES) {
+                this.animationPositionY= this.animationPositionY+(this.posY-this.animationPositionY)/(FALLING_NUM_OF_FRAMES-this.currentFallingFrame);
+                this.currentFallingFrame++;
+                this.render();
+            } else {
+                this.animationPositionY = Math.round(this.animationPositionY);
+                this.moving = false;
+            }
+        }
+        return 0;
     }
 
     rotate(): void {
     }
 
     hasColided(): boolean {
-        return true;
+        return !this.moving;
+    }
+
+
+    fall() {
+
     }
 }

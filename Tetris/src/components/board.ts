@@ -76,6 +76,13 @@ export class Board extends Component {
     }
 
     update(delta: number, keysDown: IKeysDown): void {
+        for (let i = 0; i < this._blocks.length; i++) {
+            for (let j = 0; j < this._blocks[0].length; j++) {
+                if (this._blocks[i][j] !== null) {
+                    this._blocks[i][j].update(delta, keysDown);
+                }
+            }
+        }
     }
 
     render(): void {
@@ -95,6 +102,7 @@ export class Board extends Component {
         let canPos: boolean = true;
         for (let i = 0; i < sizeY; i++) {
             for (let j = 0; j < sizeX; j++) {
+                console.log(posY, posX);
                 if (mat[i][j] === 1 && this._board[i + posY][j + posX]) {
                     canPos = false;
                     return canPos;
@@ -182,15 +190,15 @@ export class Board extends Component {
                     this._blocks[i][j] = new Block(
                         this.ctx,
                         this.gameState,
-                        this._blocks[i - 1][j].getImage(),
                         this._blocks[i - 1][j].getBlock(),
                         0,
-                        false,
+                        true,
                         this,
                         this._blocks[i - 1][j].getBgBounds(),
                         this._blocks[i - 1][j].posX,
                         this._blocks[i - 1][j].posY + 1,
-                        this._blocks[i - 1][j].getType()
+                        this._blocks[i - 1][j].getType(),
+                        this._blocks[i - 1][j].posY,
                     )
                 }
             }
@@ -224,7 +232,6 @@ export class Board extends Component {
                         this.ctx,
                         this.gameState,
                         // this.images.get(shape.block.toString() + 'block'),
-                        GlobalImageMap.imageMap.get(Shapes[shape.block] + 'block'),
                         shape.block,
                         0,
                         false,
@@ -232,7 +239,9 @@ export class Board extends Component {
                         shape.bgBound,
                         shape.posX + j,
                         shape.posY + i,
-                        shape.block.toString());
+                        shape.block.toString(),
+                        shape.posY + i,
+                    );
                     this._blocks[i + shape.posY][j + shape.posX].render();
                     //console.log(this._blocks[i + shape.posY][j + shape.posX].type);
                 }
