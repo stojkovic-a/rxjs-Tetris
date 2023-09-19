@@ -1,12 +1,9 @@
-import { Observable, catchError, from, of, tap } from "rxjs";
-import { GamePhase } from "../enums/GamePhase";
-import { IKeysDown } from "../interfaces/IKeysDown";
-import { fetchPlayerProfile$ } from "../services/apiServices";
+import { catchError, of, tap } from "rxjs";
+import { GamePhase } from "../enums";
+import { IKeysDown, IPlayerInfo, IUsersScores } from "../interfaces";
+import { fetchPlayerProfile$, drawCenteredText } from "../services";
 import { Component } from "./component";
-import { IPlayerInfo } from "../interfaces/IPlayerInfo";
-import { IUsersScores } from "../interfaces/IUsersScores";
-import { drawCenteredText } from "../services/renderServices";
-import { MEDIUM_TEXT_FONT } from "../config";
+import { ENTER_USERNAME_POS_X_RELATIVE, ENTER_USERNAME_POS_Y_DELTA, ENTER_USERNAME_POS_Y_RELATIVE, MEDIUM_TEXT_FONT } from "../config";
 
 export class EnterUsername extends Component {
     private _username: string;
@@ -14,6 +11,7 @@ export class EnterUsername extends Component {
     onCreate(): void {
         this._username = '';
     }
+
     onResize(newWidth: number, newHeight: number): void {
 
     }
@@ -40,15 +38,15 @@ export class EnterUsername extends Component {
                 this.ctx,
                 'Enter username',
                 MEDIUM_TEXT_FONT,
-                this.ctx.canvas.width / 2,
-                this.ctx.canvas.height / 2 - 60,
+                this.ctx.canvas.width * ENTER_USERNAME_POS_X_RELATIVE,
+                this.ctx.canvas.height * ENTER_USERNAME_POS_Y_RELATIVE - ENTER_USERNAME_POS_Y_DELTA,
             );
             drawCenteredText(
                 this.ctx,
                 this._username,
                 MEDIUM_TEXT_FONT,
-                this.ctx.canvas.width / 2,
-                this.ctx.canvas.height / 2
+                this.ctx.canvas.width * ENTER_USERNAME_POS_X_RELATIVE,
+                this.ctx.canvas.height * ENTER_USERNAME_POS_Y_RELATIVE
             );
         }
     }
@@ -63,41 +61,41 @@ export class EnterUsername extends Component {
         if (this._username.length > 0) {
             this.gameState.player.username = this._username;
             this.gameState.currentState = GamePhase.READY;
-            let subscription=
-            fetchPlayerProfile$(this.gameState.player.username).pipe(
-                tap((playerInfo: IUsersScores[]) => {
-                    if (playerInfo.length === 0) {
-                        this.gameState.player={
-                            id:0,
-                            score:0,
-                            linesCleared:0,
-                            elementsDroped:0,
-                            timePlaying:0,
-                            highscore:0,
-                            username:this._username
+            let subscription =
+                fetchPlayerProfile$(this.gameState.player.username).pipe(
+                    tap((playerInfo: IUsersScores[]) => {
+                        if (playerInfo.length === 0) {
+                            this.gameState.player = {
+                                id: 0,
+                                score: 0,
+                                linesCleared: 0,
+                                elementsDroped: 0,
+                                timePlaying: 0,
+                                highscore: 0,
+                                username: this._username
+                            }
+                        } else {
+                            this.gameState.player = { ...playerInfo[0], score: 0 };
                         }
-                    } else {
-                        this.gameState.player = { ...playerInfo[0], score: 0 };
-                    }
-                }),
-                catchError((error: any) => {
-                    console.error("Profile not found");
-                    this.gameState.player = {
-                        id:0 ,
-                        score: 0,
-                        linesCleared: 0,
-                        elementsDroped: 0,
-                        timePlaying: 0,
-                        highscore: 0,
-                        username: this._username
-                    }
-                    return of(this.gameState.player);
-                })
-            )
-                .subscribe((player: IPlayerInfo) => {
-                    console.log(player);
-                    subscription.unsubscribe();
-                })
+                    }),
+                    catchError((error: any) => {
+                        console.error("Profile not found");
+                        this.gameState.player = {
+                            id: 0,
+                            score: 0,
+                            linesCleared: 0,
+                            elementsDroped: 0,
+                            timePlaying: 0,
+                            highscore: 0,
+                            username: this._username
+                        }
+                        return of(this.gameState.player);
+                    })
+                )
+                    .subscribe((player: IPlayerInfo) => {
+                        console.log(player);
+                        subscription.unsubscribe();
+                    })
         }
     }
 }

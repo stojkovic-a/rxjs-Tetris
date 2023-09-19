@@ -1,8 +1,6 @@
 import { BACKGROUND_ASPECT_RATIO, BACKGROUND_ASPECT_RATIO_ALT } from "../config";
-import { IGameState } from "../interfaces/IGameState";
-import { IKeysDown } from "../interfaces/IKeysDown";
-import { IRectangle } from "../interfaces/IRectangle";
-import { drawImage } from "../services/renderServices";
+import { IGameState, IKeysDown, IRectangle } from "../interfaces";
+import { drawImage } from "../services";
 import { Component } from "./component";
 
 export class Background extends Component {
@@ -49,7 +47,7 @@ export class Background extends Component {
         });
     }
 
-    getRect():IRectangle[]{
+    getRect(): IRectangle[] {
         return this._rect;
     }
 }

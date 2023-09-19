@@ -1,16 +1,11 @@
-import { IKeysDown } from "../interfaces/IKeysDown";
+import { IKeysDown, IGameState, IRectangle } from "../interfaces";
 import { Component } from "./component";
-import { IShapes } from "../interfaces/IShapes";
-import { IGameState } from "../interfaces/IGameState";
-import { IShapeTypes } from "../interfaces/IShapeTypes";
-import { Shapes } from "../enums/Shapes";
 import { Board } from "./board";
-import { IRectangle } from "../interfaces/IRectangle";
 import { BACKGROUND_ASPECT_RATIO, BACKGROUND_BLOCKS_HEIGHT, BACKGROUND_BLOCKS_WIDTH, BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH, BOARD_BLOCK_SHIFT_X, BOARD_BLOCK_SHIFT_Y, BOARD_BORDER_SHIFT_X, BOARD_BORDER_SHIFT_Y, FALLING_NUM_OF_FRAMES } from "../config";
-import { drawImage } from "../services/renderServices";
-import { GamePhase } from "../enums/GamePhase";
+import { drawImage } from "../services";
+import { GamePhase, Shapes } from "../enums";
 import { Game } from "../game";
-import { GlobalImageMap } from "./globalImageMap";
+import { GlobalImageMap } from "../services";
 export class Shape extends Component {
 
     public readonly block: Shapes;
@@ -245,13 +240,6 @@ export class Shape extends Component {
             let drawingRect: IRectangle = null;
             const heightCoef: number = this.calculateHeightCoef();
             const widthCoef: number = this.calculateWidthCoef();
-            // drawingRect = {
-            //     x: this.shapeBound.x,
-            //     y: this.shapeBound.y,
-            //     height: this.shapeBound.height * heightCoef,
-            //     width: this.shapeBound.width * widthCoef,
-            // }
-            // drawImage(this.ctx, this.image, drawingRect);
             this.colisionDetectionMatrix.forEach((row, rowInd) => {
                 row.forEach((element, colInd) => {
                     if (element === 1) {
@@ -380,11 +368,9 @@ export class Shape extends Component {
         if (this.board.tryPosition(this.posX - shiftLeftBy, this.posY, newCDM)) {
             this.rotation = rotationNew;
             this.colisionDetectionMatrix = newCDM;
-            // this.image = GlobalImageMap.imageMap.get(Shapes[this.block].toString() + rotationNew.toString());
             this.posX -= shiftLeftBy;
         }
         this.render();
-
     }
 
     hasColided(): boolean {
@@ -425,7 +411,7 @@ export class Block extends Shape {
         );
         this.type = type;
         this.currentFallingFrame = 0;
-        this.animationPositionY=animationPositionY;
+        this.animationPositionY = animationPositionY;
     }
 
     getImage(): HTMLImageElement {
@@ -443,7 +429,6 @@ export class Block extends Shape {
     onCreate(): boolean {
         if (this.board) {
             const canSpawn = this.board.tryPosition(this.posX, this.posY, this.colisionDetectionMatrix);
-            // console.log(canSpawn, 'log from shape.ts checking it shape can be spawned');
             return canSpawn
         }
     }
@@ -482,7 +467,7 @@ export class Block extends Shape {
     update(delta: number, keysDown: IKeysDown): number {
         if (this.moving) {
             if (this.currentFallingFrame < FALLING_NUM_OF_FRAMES) {
-                this.animationPositionY= this.animationPositionY+(this.posY-this.animationPositionY)/(FALLING_NUM_OF_FRAMES-this.currentFallingFrame);
+                this.animationPositionY = this.animationPositionY + (this.posY - this.animationPositionY) / (FALLING_NUM_OF_FRAMES - this.currentFallingFrame);
                 this.currentFallingFrame++;
                 this.render();
             } else {
@@ -500,8 +485,4 @@ export class Block extends Shape {
         return !this.moving;
     }
 
-
-    fall() {
-
-    }
 }

@@ -1,4 +1,4 @@
-export interface IFrameData{
-    timeStamp:number;
-    deltaTime:number;
+export interface IFrameData {
+    timeStamp: number;
+    deltaTime: number;
 }

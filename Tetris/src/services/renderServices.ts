@@ -1,5 +1,5 @@
-import { BACKGROUN_RGB_STRING, FONT_COLOR, FONT_SHADOW_COLOR, FONT_SHADOW_SIZE } from "../config";
-import { IRectangle } from "../interfaces/IRectangle";
+import { FONT_COLOR, FONT_SHADOW_COLOR, FONT_SHADOW_SIZE } from "../config";
+import { IRectangle } from "../interfaces";
 
 const fillRect = (ctx: CanvasRenderingContext2D, rect: IRectangle) => {
   ctx.fillRect(rect.x, rect.y, rect.width, rect.height);

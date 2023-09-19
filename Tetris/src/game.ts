@@ -1,31 +1,16 @@
 import { Observable, Subscription, debounceTime, fromEvent } from "rxjs";
-import { GamePhase } from "./enums/GamePhase";
-import { loadBackgroundImage$, loadShapeSprites$ } from "./services/imageLoader";
-import { Shape } from "./components/shape";
-import { EnterUsername } from "./components/enterUsername";
-import { Highscores } from "./components/highscores";
-import { Overlay } from "./components/overlay";
-import { Background } from "./components/background";
-import { IGameState } from "./interfaces/IGameState";
-import { BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH, GAME_SPEED, INITIAL_GAME_STATE, MIN_INTERVAL_MS, SHAPE_DROP_SCORE } from "./config";
-import { decreasingIntervalObservable, formula } from "./services/gameTicker";
-// import { shapeSpawner } from "./services/shapeSpawner";
-import { initializeMainLoop } from "./services/renderLoop";
-import { IKeysDown } from "./interfaces/IKeysDown";
-import { putPlayerProfile } from "./services/apiServices";
-import { Board } from "./components/board";
-import { startSpawningShapes } from "./services/shapeSpawner";
-import { IBoolWrapper } from "./interfaces/IBoolWrapper";
-import { TickerReset } from "./components/TikerReset";
-import { IUsersScores } from "./interfaces/IUsersScores";
-// import { getKeysDown } from "./services/keybordInputService";
+import { GamePhase } from "./enums";
+import { loadBackgroundImage$, initializeMainLoop, putPlayerProfile, startSpawningShapes, TickerReset } from "./services";
+import { Shape, EnterUsername, Highscores, Overlay, Background, Board } from "./components";
+import { IGameState, IKeysDown, IBoolWrapper, IUsersScores } from "./interfaces";
+import { BOARD_BLOCKS_HEIGHt, BOARD_BLOCKS_WIDTH, GAME_SPEED, INITIAL_GAME_STATE, SHAPE_DROP_SCORE } from "./config";
+
 export class Game {
     private readonly canvas: HTMLCanvasElement;
     private readonly ctx: CanvasRenderingContext2D;
     public static gameState: IGameState = INITIAL_GAME_STATE;
 
     private background: Background;
-
     private shapes: Shape[];
     private enterUsername: EnterUsername;
     private highscores: Highscores;
@@ -52,8 +37,8 @@ export class Game {
         this.highscores = new Highscores(this.ctx, Game.gameState);
         this.overlay = new Overlay(this.ctx, Game.gameState);
         this.board = new Board(this.ctx, Game.gameState, BOARD_BLOCKS_WIDTH, BOARD_BLOCKS_HEIGHt);
-        Game.canSpawn.val = true;
-        // this.gameTick$ = decreasingIntervalObservable(MIN_INTERVAL_MS, formula);
+        Game.canSpawn.val = false;
+
         this.mainLoop$ = initializeMainLoop();
         TickerReset.stop();
 
@@ -74,46 +59,31 @@ export class Game {
             }
         )
 
-
         loadBackgroundImage$().subscribe((img) => {
             this.background = new Background(this.ctx, Game.gameState, img);
-            //  this.shapeSpawner$ = startSpawningShapes(this.ctx, this.gameState,Game.canSpawn,this.board,this.background.getRect()[0]);
             this.shapeSpawner$ = startSpawningShapes(this.ctx, Game.gameState, this.board, this.background.getRect()[0]);
-            // console.log(this.shapeSpawner$);
         })
-
-        // if (this.background)
-        //     this.shapeSpawner$ = startSpawningShapes(this.ctx, this.gameState, Game.canSpawn, this.board, this.background.getRect()[0]);
-
-
     }
 
     startRound() {
-        // console.log("log from game.ts startRound() line 88");
         if (this.shapeSpawner$) {
-            // console.log("lof from game.ts startRound() if shapeSpawner$",this.shapeSpawner$);
             Game.canSpawn.val = true;
             Game.gameState.currentState = GamePhase.PLAYING;
             TickerReset.stop();
             TickerReset.start();
-            // console.log(Game.canSpawn.val);
             this.shapeSubscription = this.shapeSpawner$.subscribe(
                 (shape) => {
                     if (shape) {
-                        //console.log("log from subscribe", shape);
                         if (shape.onCreate() === false) {
                             this.die();
                         }
                         this.shapes.push(shape);
-                        Game.gameState.player.score+=SHAPE_DROP_SCORE;
-                        Game.gameState.score+=SHAPE_DROP_SCORE;
-                        Game.gameState.player.elementsDroped+=1;
-                        // console.log(shape);
-                        console.log('SHAPE LENGth', this.shapes.length);
+                        Game.gameState.player.score += SHAPE_DROP_SCORE;
+                        Game.gameState.score += SHAPE_DROP_SCORE;
+                        Game.gameState.player.elementsDroped += 1;
                     }
                 }
             )
-
             Game.gameState.score = 0;
             Game.gameState.player.score = 0;
         } else {
@@ -145,6 +115,7 @@ export class Game {
                 break;
         }
     }
+
     resize(newWidth: number, newHeight: number) {
         this.canvas.width = newWidth;
         this.canvas.height = newHeight;
@@ -195,24 +166,24 @@ export class Game {
 
         if (Game.gameState.score > Game.gameState.player.highscore) {
             Game.gameState.player.highscore = Game.gameState.score;
-            let userScore:IUsersScores={
-                id:Game.gameState.player.id,
-                username:Game.gameState.player.username,
-                highscore:Game.gameState.player.highscore,
-                linesCleared:Game.gameState.player.linesCleared,
-                elementsDroped:Game.gameState.player.elementsDroped,
-                timePlaying:Game.gameState.player.timePlaying
+            let userScore: IUsersScores = {
+                id: Game.gameState.player.id,
+                username: Game.gameState.player.username,
+                highscore: Game.gameState.player.highscore,
+                linesCleared: Game.gameState.player.linesCleared,
+                elementsDroped: Game.gameState.player.elementsDroped,
+                timePlaying: Game.gameState.player.timePlaying
             };
 
             putPlayerProfile(userScore).then((player) => {
-                Game.gameState.player = { ...player, score:Game.gameState.score };
+                Game.gameState.player = { ...player, score: Game.gameState.score };
             });
         }
         this.cleanShapesAndBoard();
     }
-    cleanShapesAndBoard():void{
-        this.shapes=[];
+
+    cleanShapesAndBoard(): void {
+        this.shapes = [];
         this.board.clear();
     }
-    //detect death and call die;
 }

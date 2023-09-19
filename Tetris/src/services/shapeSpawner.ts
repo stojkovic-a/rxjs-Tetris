@@ -1,23 +1,17 @@
-import { Observable, config, defer, filter, interval, map, of, switchMap, take, tap, toArray } from "rxjs";
-import { IGameState } from "../interfaces/IGameState";
-import { Shape,/* ShapeI, ShapeJ, ShapeL, ShapeO, ShapeS, ShapeT, ShapeZ*/ } from "../components/shape";
-import { loadBackgroundImage$, loadShapeSprites$ } from "./imageLoader";
-import { Shapes } from "../enums/Shapes";
-import { Board } from "../components/board";
-import { IRectangle } from "../interfaces/IRectangle";
+import { Observable, filter, interval, of, switchMap, tap } from "rxjs";
+import { IGameState, IRectangle } from "../interfaces";
+import { Shape, Board } from "../components";
+import { loadShapeSprites$ } from "./imageLoader";
+import { Shapes } from "../enums";
 import { INITAIAL_SHAPES, MIN_INTERVAL_MS, NUM_SHAPES, STARTING_POS_X, STARTING_POS_Y } from "../config";
-import { IBoolWrapper } from "../interfaces/IBoolWrapper";
 import { Game } from "../game";
-import { GlobalImageMap } from "../components/globalImageMap";
+import { GlobalImageMap } from "./globalImageMap";
 
-// export const shapeSpawner=():Observable<number>=>{
-//     return defer(()=>of(Math.floor(Math.random()*7)))
-
-// }
 
 function getRandomShapeNumber(): number {
     return Math.floor(Math.random() * NUM_SHAPES);
 }
+
 function returnShapeFromNumber(
     num: number,
     ctx: CanvasRenderingContext2D,
@@ -39,7 +33,6 @@ function returnShapeFromNumber(
             STARTING_POS_X,
             STARTING_POS_Y
         );
-        // console.log(shapeToReturn);
         return of(shapeToReturn);
     } else {
         return loadShapeSprites$().pipe(
@@ -65,7 +58,6 @@ function returnShapeFromNumber(
                         STARTING_POS_X,
                         STARTING_POS_Y
                     );
-                // console.log(shapeToReturn);
                 return of(shapeToReturn);
             })
         );

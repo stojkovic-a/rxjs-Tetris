@@ -1,24 +1,14 @@
-import { sample } from "rxjs";
-import { IBoolNumber } from "../interfaces/IBoolNumber";
-import { IGameState } from "../interfaces/IGameState";
-import { IKeysDown } from "../interfaces/IKeysDown";
-import { loadShapeSprites$ } from "../services/imageLoader";
+import { IBoolNumber, IGameState, IKeysDown } from "../interfaces";
 import { Component } from "./component";
 import { Block, Shape } from "./shape";
 import { Game } from "../game";
-import { GlobalImageMap } from "./globalImageMap";
-import { Shapes } from "../enums/Shapes";
-import { scoreFormula } from "../services/scoreFormula";
+import { scoreFormula } from "../services";
 
 export class Board extends Component {
     private _sizeX: number;
     private _sizeY: number;
     private _board: Boolean[][];
     private _blocks: Block[][];
-    // private sprites: { type: string, img: HTMLImageElement }[] = [];
-    private images: Map<string, HTMLImageElement> = new Map();
-    private canSpawn: Game;
-
 
     constructor(
         ctx: CanvasRenderingContext2D,
@@ -40,25 +30,6 @@ export class Board extends Component {
         for (let i = 0; i < this._sizeX; i++) {
             this._board[this._sizeY][i] = true;
         }
-
-        const sprites: { type: string, img: HTMLImageElement }[] = [];
-
-        // loadShapeSprites$().
-        //     pipe(
-
-        // )
-        //     .subscribe(
-        //         (x) => {
-        //             console.log(x);
-        //             sprites.push(x);
-        //         }
-        //     );
-
-
-        // sprites.map(sprite => {
-        //     this.images.set(sprite.type, sprite.img);
-        // });
-
     }
 
     onCreate(): void {
@@ -66,23 +37,21 @@ export class Board extends Component {
 
     onResize(newWidth: number, newHeight: number): void {
         if (this._blocks !== undefined)
-            for (let i = 0; i < this._blocks.length; i++) {
-                for (let j = 0; j < this._blocks[0].length; j++) {
-                    if (this._blocks[i][j] !== null) {
-                        this._blocks[i][j].onResize(newWidth, newHeight);
-                    }
-                }
-            }
+            this._blocks.forEach((row, i) => {
+                row.forEach((element, j) => {
+                    element.onResize(newWidth, newHeight);
+                })
+            })
     }
 
     update(delta: number, keysDown: IKeysDown): void {
-        for (let i = 0; i < this._blocks.length; i++) {
-            for (let j = 0; j < this._blocks[0].length; j++) {
-                if (this._blocks[i][j] !== null) {
-                    this._blocks[i][j].update(delta, keysDown);
+        this._blocks.forEach((row, i) => {
+            row.forEach((element, j) => {
+                if (element != null) {
+                    element.update(delta, keysDown);
                 }
-            }
-        }
+            })
+        })
     }
 
     render(): void {
@@ -102,12 +71,15 @@ export class Board extends Component {
         let canPos: boolean = true;
         for (let i = 0; i < sizeY; i++) {
             for (let j = 0; j < sizeX; j++) {
-                console.log(posY, posX);
                 if (mat[i][j] === 1 && this._board[i + posY][j + posX]) {
                     canPos = false;
                     return canPos;
                 }
-                if (mat[i][j] === 1 && (i + posY >= this._sizeY || j + posX >= this._sizeX)) {
+                if (
+                    mat[i][j] === 1
+                    &&
+                    (i + posY >= this._sizeY || j + posX >= this._sizeX)
+                ) {
                     canPos = false;
                     return canPos;
                 }
@@ -115,7 +87,6 @@ export class Board extends Component {
                     canPos = false;
                     return canPos;
                 }
-
             }
         }
         return canPos;
@@ -123,31 +94,27 @@ export class Board extends Component {
 
     canAdd(posX: number, posY: number, mat: number[][]): boolean {
         if (!this.tryPosition(posX, posY, mat)) return false;
-        const sizeY = mat.length;
-        const sizeX = mat[0].length;
         let canAdd: boolean = false;
-        for (let i = 0; i < sizeY; i++) {
-            for (let j = 0; j < sizeX; j++) {
-                if (mat[i][j] === 1 && this._board[i + posY + 1][j + posX]) {
+        mat.forEach((row, i) => {
+            row.forEach((element, j) => {
+                if (element === 1 && this._board[i + posY + 1][j + posX]) {
                     canAdd = true;
                     return canAdd
                 }
-            }
-        }
+            })
+        })
         return canAdd;
     }
 
     tryAdd(shape: Shape, posX: number, posY: number, mat: number[][]): IBoolNumber {
-        const sizeY = mat.length;
-        const sizeX = mat[0].length;
         if (this.canAdd) {
-            for (let i = 0; i < sizeY; i++) {
-                for (let j = 0; j < sizeX; j++) {
-                    if (mat[i][j] === 1) {
+            mat.forEach((row, i) => {
+                row.forEach((element, j) => {
+                    if (element === 1) {
                         this._board[i + posY][j + posX] = true;
                     }
-                }
-            }
+                })
+            })
             this.switchShapeWithBlocks(shape);
             const numRemoved = this.removeFullRows();
             return { check: true, num: numRemoved }
@@ -203,13 +170,11 @@ export class Board extends Component {
                 }
             }
         }
-
         for (let i = 0; i < this._sizeX; i++) {
             this._board[0][i] = false;
             this._blocks[0][i] = null;
         }
     }
-
 
     getBoard(): Boolean[][] {
         return this._board;
@@ -218,7 +183,6 @@ export class Board extends Component {
     getSizeX(): number {
         return this._sizeX;
     }
-
 
     getSizeY(): number {
         return this._sizeY;
@@ -231,7 +195,6 @@ export class Board extends Component {
                     this._blocks[i + shape.posY][j + shape.posX] = new Block(
                         this.ctx,
                         this.gameState,
-                        // this.images.get(shape.block.toString() + 'block'),
                         shape.block,
                         0,
                         false,
@@ -243,12 +206,11 @@ export class Board extends Component {
                         shape.posY + i,
                     );
                     this._blocks[i + shape.posY][j + shape.posX].render();
-                    //console.log(this._blocks[i + shape.posY][j + shape.posX].type);
                 }
             }
         }
-
     }
+
     clear(): void {
         this._board = new Array(this._sizeY + 1).fill([]).map(() => new Array(this._sizeX).fill(false));
         this._blocks = new Array(this._sizeY).fill([]).map(() => new Array(this._sizeX).fill(null));

@@ -1,3 +1,3 @@
-export interface IBoolWrapper{
-    val:boolean;
+export interface IBoolWrapper {
+    val: boolean;
 }

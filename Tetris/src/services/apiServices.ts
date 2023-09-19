@@ -1,9 +1,6 @@
-import { Observable, async, from } from "rxjs";
+import { Observable, from } from "rxjs";
 import { API_URL } from "../config";
-import { AsyncAction } from "rxjs/internal/scheduler/AsyncAction";
-import { IPlayerInfo } from "../interfaces/IPlayerInfo";
-import { IShapeTypes } from "../interfaces/IShapeTypes";
-import { IUsersScores } from "../interfaces/IUsersScores";
+import { IShapeTypes, IUsersScores } from "../interfaces";
 
 const fetchFromApi$ = <T>(
     path: string,
@@ -58,21 +55,21 @@ const putPlayerProfile = (player: IUsersScores): Promise<IUsersScores> => {
     let method: string;
     let route: string;
 
-    if (player.id!== 0) {
+    if (player.id !== 0) {
         method = 'PUT';
         route = `/users/${player.id}`
-    }else{
-        method='POST';
-        route="/users"
+    } else {
+        method = 'POST';
+        route = "/users"
     }
 
-    return apiCall<IUsersScores>(route,{
+    return apiCall<IUsersScores>(route, {
         method,
-        body:JSON.stringify(player),
-        headers:{
-            'Content-Type':'application/json',
+        body: JSON.stringify(player),
+        headers: {
+            'Content-Type': 'application/json',
         }
     });
 }
 
-export { fetchFromApi$, fetchPlayerProfile$, fetchHighScore$, fetchSprite$,putPlayerProfile }
+export { fetchFromApi$, fetchPlayerProfile$, fetchHighScore$, fetchSprite$, putPlayerProfile }

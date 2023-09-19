@@ -1,6 +1,6 @@
-import { Shapes } from "../enums/Shapes";
+import { Shapes } from "../enums";
 
-export interface IShapeTypes{
-    type:Shapes,
-    image:string
+export interface IShapeTypes {
+    type: Shapes,
+    image: string
 }

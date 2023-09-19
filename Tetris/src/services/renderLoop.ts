@@ -1,9 +1,7 @@
 import { Observable, buffer, expand, filter, fromEvent, map, merge, of, withLatestFrom } from "rxjs"
-import { IFrameData } from "../interfaces/IFrameData"
+import { IFrameData, IKeysDown } from "../interfaces"
 import { MAXIMUM_DELTA_TIME, MIN_INTERVAL_MS } from "../config";
-import { IKeysDown } from "../interfaces/IKeysDown";
 import { decreasingIntervalObservable, formula } from "./gameTicker";
-import { IGameState } from "../interfaces/IGameState";
 
 
 
@@ -20,7 +18,7 @@ export const initializeMainLoop = (): Observable<[number, IKeysDown]> => {
   );
 
   const bufferedKeysDown$ = getBufferedKeysDown(frame$);
-  return merge(ticker$,frame$.pipe(
+  return merge(ticker$, frame$.pipe(
     withLatestFrom(bufferedKeysDown$))
   )
 }

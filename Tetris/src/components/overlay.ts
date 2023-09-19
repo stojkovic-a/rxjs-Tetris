@@ -1,8 +1,8 @@
 import { LARGE_TEXT_FONT, MEDIUM_TEXT_FONT, SMALL_TEXT_FONT } from "../config";
-import { GamePhase } from "../enums/GamePhase";
+import { GamePhase } from "../enums";
 import { Game } from "../game";
-import { IKeysDown } from "../interfaces/IKeysDown";
-import { drawCenteredText, drawText } from "../services/renderServices";
+import { IKeysDown } from "../interfaces";
+import { drawCenteredText, drawText } from "../services";
 import { Component } from "./component";
 
 export class Overlay extends Component {
@@ -65,8 +65,8 @@ export class Overlay extends Component {
             this.ctx,
             scoreText,
             LARGE_TEXT_FONT,
-             70,
-             70
+            70,
+            70
         );
     }
 

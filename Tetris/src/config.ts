@@ -1,6 +1,7 @@
-import { GamePhase } from "./enums/GamePhase";
+import { GamePhase } from "./enums";
 
 export const API_URL = 'http://localhost:3000'
+
 export const BACKGROUND_ASPECT_RATIO_ALT = 6 / 11
 export const BACKGROUND_ASPECT_RATIO = 12 / 19
 
@@ -69,9 +70,18 @@ export const SHAPE_DROP_SCORE = 40;
 export const LINE_CLEAR_COEF = 100;
 export const LINE_CLEAR_OFFSET = 50;
 
-export const STARTING_POS_X=3;
-export const STARTING_POS_Y=0;
+export const STARTING_POS_X = 3;
+export const STARTING_POS_Y = 0;
 
-export const BACKGROUN_RGB_STRING='32, 33, 36'
 
-export const FALLING_NUM_OF_FRAMES=20
+export const FALLING_NUM_OF_FRAMES = 20
+
+export const HIGHSCORE_POS_X = 0
+export const HIGHSCORE_POS_Y = 100
+export const HIGHSCORE_POS_X_RELATIVE = 0.35
+export const HIGHSCORE_POS_Y_RELATIVE = 0.5
+export const SCORE_ROW_SPACE_Y = 50
+
+export const ENTER_USERNAME_POS_X_RELATIVE = 0.5
+export const ENTER_USERNAME_POS_Y_RELATIVE = 0.5
+export const ENTER_USERNAME_POS_Y_DELTA = 60

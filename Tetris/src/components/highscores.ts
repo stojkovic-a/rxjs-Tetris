@@ -1,12 +1,8 @@
-import { toArray } from "rxjs";
-import { GamePhase } from "../enums/GamePhase";
-import { IKeysDown } from "../interfaces/IKeysDown";
-import { IPlayerInfo } from "../interfaces/IPlayerInfo";
-import { IUsersScores } from "../interfaces/IUsersScores";
-import { fetchHighScore$ } from "../services/apiServices";
+import { GamePhase } from "../enums";
+import { IKeysDown, IUsersScores } from "../interfaces";
+import { fetchHighScore$, drawText } from "../services";
 import { Component } from "./component";
-import { drawText } from "../services/renderServices";
-import { MEDIUM_TEXT_FONT } from "../config";
+import { HIGHSCORE_POS_X, HIGHSCORE_POS_X_RELATIVE, HIGHSCORE_POS_Y, HIGHSCORE_POS_Y_RELATIVE, MEDIUM_TEXT_FONT, SCORE_ROW_SPACE_Y } from "../config";
 import { Game } from "../game";
 
 export class Highscores extends Component {
@@ -21,14 +17,12 @@ export class Highscores extends Component {
     }
 
     update(delta: number, keysDown: IKeysDown): void {
-        if (Game.gameState.currentState === GamePhase.READY||Game.gameState.currentState===GamePhase.GAME_OVER) {
-            // console.log('sup from highcores update');
+        if (Game.gameState.currentState === GamePhase.READY || Game.gameState.currentState === GamePhase.GAME_OVER) {
             if (keysDown['KeyH']) {
                 this._shown = !this._shown;
                 if (this._shown) {
-                    let subscription=fetchHighScore$()
+                    let subscription = fetchHighScore$()
                         .pipe(
-                        //toArray()
                     )
                         .subscribe((scores) => {
                             this._highscores = scores;
@@ -38,8 +32,8 @@ export class Highscores extends Component {
                         });
                 }
             }
-        }else{
-            this._shown=false;
+        } else {
+            this._shown = false;
         }
     }
     render(): void {
@@ -48,8 +42,9 @@ export class Highscores extends Component {
                 this.ctx,
                 'Highscores:',
                 MEDIUM_TEXT_FONT,
-                this.ctx.canvas.width * 0.6,
-                100
+                this.ctx.canvas.width * HIGHSCORE_POS_X_RELATIVE,
+                this.ctx.canvas.height * HIGHSCORE_POS_Y_RELATIVE,
+
             );
 
             this._highscores.forEach((player, index) => {
@@ -58,8 +53,8 @@ export class Highscores extends Component {
                     `${index + 1}. ${player.username.padEnd(5)}- ${player.highscore
                         .toString().padStart(2)}`,
                     MEDIUM_TEXT_FONT,
-                    this.ctx.canvas.width * 0.6,
-                    50 * index + 150,
+                    this.ctx.canvas.width * HIGHSCORE_POS_X_RELATIVE,
+                    this.ctx.canvas.height * HIGHSCORE_POS_Y_RELATIVE + SCORE_ROW_SPACE_Y * (index + 1),
                 );
             });
         }

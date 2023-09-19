@@ -1,4 +1,4 @@
-export interface IBoolNumber{
-    check:boolean,
-    num:number
+export interface IBoolNumber {
+    check: boolean,
+    num: number
 }

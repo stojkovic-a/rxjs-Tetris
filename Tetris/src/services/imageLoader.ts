@@ -1,5 +1,6 @@
 import { Observable, from, fromEvent, map, mergeMap } from "rxjs";
 import { fetchSprite$ } from "./apiServices";
+
 export const loadBackgroundImage$ = (): Observable<HTMLImageElement> => {
     return from(fetchSprite$()).pipe(
         mergeMap((sprites) => {
